@@ -12,4 +12,4 @@ server/node_modules/
 
 # Build output
 client/dist/
-server/dist/f4
+server/dist/
