@@ -17,12 +17,12 @@ import api from '../utils/api';
 import { logout } from '../redux/slices/authSlice';
 
 // Import Profile Components
-import ProfileOverview from '../components/profile/ProfileOverview';
-import EditProfile from '../components/profile/EditProfile';
-import OrderHistory from '../components/profile/OrderHistory';
-import AddressBook from '../components/profile/AddressBook';
-import ChangePassword from '../components/profile/ChangePassword';
-import AccountSettings from '../components/profile/AccountSettings';
+import ProfileOverview from '../components/Profile/ProfileOverview';
+import EditProfile from '../components/Profile/EditProfile';
+import OrderHistory from '../components/Profile/OrderHistory';
+import AddressBook from '../components/Profile/AddressBook';
+import ChangePassword from '../components/Profile/ChangePassword';
+import AccountSettings from '../components/Profile/AccountSettings';
 
 const Profile = () => {
   const navigate = useNavigate();
