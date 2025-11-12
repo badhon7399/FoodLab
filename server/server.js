@@ -2,6 +2,12 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
+import helmet from 'helmet'
+import compression from 'compression'
+import rateLimit from 'express-rate-limit'
+import mongoSanitize from 'express-mongo-sanitize'
+import xss from 'xss-clean'
+import hpp from 'hpp'
 import connectDb from './config/db.js'
 
 import authRoutes from './routes/auth.js'
@@ -44,12 +50,35 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization'],
 }
 
+app.set('trust proxy', 1)
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+})
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+})
+
+app.use(helmet())
+app.use(compression())
+app.use(express.json({ limit: '1mb' }))
+app.use(mongoSanitize())
+app.use(xss())
+app.use(hpp())
 app.use(cors(corsOptions))
-app.use(express.json())
-app.use(morgan('dev'))
+if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'))
+app.use(apiLimiter)
 
 app.get('/api/health', (req, res) => res.json({ ok: true }))
 
+app.use('/api/auth', authLimiter)
 app.use('/api/auth', authRoutes)
 app.use('/api/food', foodRoutes)
 app.use('/api/orders', orderRoutes)
