@@ -20,6 +20,8 @@ import paymentRoutes from './routes/payment.js'
 import adminRoutes from './routes/admin.js'
 import userRoutes from './routes/user.js'
 import { notFound, errorHandler } from './middleware/errorHandler.js'
+import dns from 'dns'
+dns.setDefaultResultOrder('ipv4first')
 
 dotenv.config()
 const app = express()
