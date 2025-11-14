@@ -2,17 +2,60 @@ import Order from '../models/Order.js'
 import asyncWrap from '../utils/asyncHandler.js'
 
 export const createOrder = asyncWrap(async (req, res) => {
-    const { items, total, address } = req.body
+    const {
+        items,
+        deliveryDetails,
+        subtotal,
+        deliveryFee = 0,
+        discount = 0,
+        tax = 0,
+        totalAmount,
+        paymentMethod,
+        promoCode,
+    } = req.body
+
     if (!Array.isArray(items) || items.length === 0) {
         res.status(400)
         throw new Error('Order items are required')
     }
-    if (typeof total !== 'number') {
+
+    // Compute subtotal from items when not provided or invalid
+    const computedSubtotal = typeof subtotal === 'number' && !Number.isNaN(subtotal)
+        ? subtotal
+        : items.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0)
+
+    const df = Number(deliveryFee) || 0
+    const dc = Number(discount) || 0
+    const tx = Number(tax) || 0
+
+    if (!paymentMethod) {
         res.status(400)
-        throw new Error('Order total must be a number')
+        throw new Error('Payment method is required')
     }
-    const order = await Order.create({ user: req.userId, items, total, address })
-    res.status(201).json({ success: true, data: order })
+
+    const computedTotal = typeof totalAmount === 'number' && !Number.isNaN(totalAmount)
+        ? totalAmount
+        : computedSubtotal + df + tx - dc
+
+    if ([computedSubtotal, df, dc, tx, computedTotal].some(n => typeof n !== 'number' || Number.isNaN(n))) {
+        res.status(400)
+        throw new Error('Order amounts must be valid numbers')
+    }
+
+    const order = await Order.create({
+        user: req.userId,
+        items,
+        deliveryDetails,
+        subtotal: computedSubtotal,
+        deliveryFee: df,
+        discount: dc,
+        tax: tx,
+        totalAmount: computedTotal,
+        paymentMethod,
+        promoCode,
+    })
+
+    res.status(201).json({ success: true, order })
 })
 
 export const listMyOrders = asyncWrap(async (req, res) => {
