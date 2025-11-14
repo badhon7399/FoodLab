@@ -13,6 +13,7 @@ import Signup from "../pages/Signup.jsx";
 import Profile from "../pages/Profile.jsx";
 import ForgotPassword from "../pages/ForgotPassword.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import OrderSuccess from "../pages/OrderSuccess.jsx";
 
 export default function PublicLayout({ isCartOpen, setIsCartOpen }) {
   return (
@@ -35,6 +36,14 @@ export default function PublicLayout({ isCartOpen, setIsCartOpen }) {
             element={
               <ProtectedRoute>
                 <Orders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order-success/:orderId"
+            element={
+              <ProtectedRoute>
+                <OrderSuccess />
               </ProtectedRoute>
             }
           />

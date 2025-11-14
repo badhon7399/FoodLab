@@ -12,6 +12,9 @@ const OrderSuccess = () => {
     // Stop confetti after 5 seconds
     setTimeout(() => setShowConfetti(false), 5000);
   }, []);
+  useEffect(() => {
+  sessionStorage.removeItem('placingOrder');
+}, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
