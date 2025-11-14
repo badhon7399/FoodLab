@@ -58,11 +58,12 @@ const Checkout = () => {
 
   // Halls list
   const halls = [
-    "Amar Ekushey Hall",
-    "Shaheed Abdur Rab Hall",
-    "Shah Jalal Hall",
-    "Shamsun Nahar Hall",
-    "Dr. M. A. Rashid Hall",
+    "Kabi Kazi Nazrul Islam Hall",
+    "Saheed Abu Sayed Hall",
+    "Shah Hall",
+    "Saheed Tarek Huda Hall",
+    "Muktizoddha Hall",
+  
     "Others",
   ];
 

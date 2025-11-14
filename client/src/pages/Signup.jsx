@@ -509,7 +509,7 @@ const Signup = () => {
                         value={formData.studentId}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none"
-                        placeholder="e.g., U1804001"
+                        placeholder="e.g., 1804001"
                       />
                     </div>
 
