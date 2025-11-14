@@ -68,9 +68,14 @@ const Checkout = () => {
   ];
 
   useEffect(() => {
-    // Redirect if cart is empty
-    if (items.length === 0) {
+    // Redirect if cart is empty (but skip when we're in the middle of placing an order)
+    const placing = sessionStorage.getItem('placingOrder') === '1';
+    if (items.length === 0 && !placing) {
       navigate("/menu");
+    }
+    // If items exist but the flag is still set (stale), clear it
+    if (items.length > 0 && placing) {
+      sessionStorage.removeItem('placingOrder');
     }
   }, [items, navigate]);
 
@@ -181,6 +186,8 @@ const Checkout = () => {
       );
 
       if (data.success) {
+        // set a flag to prevent empty-cart redirect during order completion
+        sessionStorage.setItem('placingOrder', '1');
         // If Bkash payment, initiate payment
         if (paymentMethod === "Bkash") {
           await initiateBkashPayment(data.order._id, finalTotal);
@@ -188,9 +195,15 @@ const Checkout = () => {
           // Cash on Delivery - Go to success page
           dispatch(clearCart());
           navigate(`/order-success/${data.order._id}`);
+          // clear the flag after navigation is triggered
+          setTimeout(() => {
+            sessionStorage.removeItem('placingOrder');
+          }, 0);
         }
       }
     } catch (err) {
+      // ensure the placing flag is cleared on failure
+      sessionStorage.removeItem('placingOrder');
       setError(err.response?.data?.message || "Failed to place order");
       setLoading(false);
     }
