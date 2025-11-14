@@ -86,29 +86,30 @@ const Orders = () => {
 
   const setupSocketListeners = () => {
     const token = localStorage.getItem("token");
-    if (token) {
-      const socket = initializeSocket(token);
+    if (!token) return;
 
-      socket.on("order-status-updated", (data) => {
-        console.log("Order status updated:", data);
-        // Update order in list
-        setOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order._id === data.orderId
-              ? { ...order, status: data.status }
-              : order
-          )
-        );
+    const socket = initializeSocket(token);
+    if (!socket) return; // sockets disabled or failed to init
 
-        // Show notification
-        if ("Notification" in window && Notification.permission === "granted") {
-          new Notification("Order Update! 📦", {
-            body: `Your order is now ${data.status}`,
-            icon: "/logo.png",
-          });
-        }
-      });
-    }
+    socket.on("order-status-updated", (data) => {
+      console.log("Order status updated:", data);
+      // Update order in list
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === data.orderId
+            ? { ...order, status: data.status }
+            : order
+        )
+      );
+
+      // Show notification
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("Order Update! 📦", {
+          body: `Your order is now ${data.status}`,
+          icon: "/logo.png",
+        });
+      }
+    });
   };
 
   const fetchOrders = async () => {

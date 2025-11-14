@@ -8,7 +8,10 @@ import rateLimit from 'express-rate-limit'
 import mongoSanitize from 'express-mongo-sanitize'
 import xss from 'xss-clean'
 import hpp from 'hpp'
+import http from 'http'
+import { Server as SocketIOServer } from 'socket.io'
 import connectDb from './config/db.js'
+import { initializeSocket } from './socket/events.js'
 
 import authRoutes from './routes/auth.js'
 import foodRoutes from './routes/food.js'
@@ -92,7 +95,24 @@ app.use(errorHandler)
 const port = process.env.PORT || 5000
 connectDb()
     .then(() => {
-        const server = app.listen(port, () => {
+        // Create HTTP server and attach Socket.IO
+        const server = http.createServer(app)
+
+        const socketCorsOrigins = process.env.NODE_ENV !== 'production'
+            ? [/^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/]
+            : (process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(s => s.trim()) : [])
+
+        const io = new SocketIOServer(server, {
+            cors: {
+                origin: socketCorsOrigins,
+                credentials: true,
+                methods: ['GET', 'POST']
+            }
+        })
+
+        initializeSocket(io)
+
+        server.listen(port, () => {
             console.log(`✅ Server running on port ${port}`)
         })
         

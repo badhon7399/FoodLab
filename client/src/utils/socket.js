@@ -3,24 +3,39 @@ import { io } from 'socket.io-client';
 let socket;
 
 export const initializeSocket = (token) => {
+    // Feature flag: enable only when backend supports Socket.IO
+    if (import.meta.env.VITE_ENABLE_SOCKET !== 'true') return null;
+
     if (socket) return socket;
 
-    socket = io(import.meta.env.VITE_API_URL.replace('/api', ''), {
-        auth: { token },
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 5,
-    });
+    try {
+        const api = import.meta.env.VITE_API_URL || '';
+        const baseUrl = api.endsWith('/api') ? api.slice(0, -4) : api.replace('/api', '');
 
-    socket.on('connect', () => {
-        console.log('✅ Socket connected:', socket.id);
-    });
+        socket = io(baseUrl, {
+            auth: { token },
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 5,
+        });
 
-    socket.on('disconnect', () => {
-        console.log('❌ Socket disconnected');
-    });
+        socket.on('connect', () => {
+            console.log('✅ Socket connected:', socket.id);
+        });
 
-    return socket;
+        socket.on('disconnect', () => {
+            console.log('❌ Socket disconnected');
+        });
+
+        socket.on('connect_error', (err) => {
+            console.warn('Socket connect error:', err?.message || err);
+        });
+
+        return socket;
+    } catch (e) {
+        console.warn('Socket init failed:', e?.message || e);
+        return null;
+    }
 };
 
 export const getSocket = () => socket;
