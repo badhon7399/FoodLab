@@ -12,6 +12,7 @@ import ContactUs from "../pages/ContactUs.jsx";
 import Signup from "../pages/Signup.jsx";
 import Profile from "../pages/Profile.jsx";
 import ForgotPassword from "../pages/ForgotPassword.jsx";
+import ResetPassword from "../pages/ResetPassword.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import OrderSuccess from "../pages/OrderSuccess.jsx";
 
@@ -50,6 +51,7 @@ export default function PublicLayout({ isCartOpen, setIsCartOpen }) {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route
