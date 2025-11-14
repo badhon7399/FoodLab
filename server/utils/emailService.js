@@ -34,7 +34,7 @@ function createTransporter() {
 export async function sendEmail({ to, subject, text, html }) {
     const transporter = createTransporter()
 
-    const from = process.env.EMAIL_FROM || process.env.SMTP_GMAIL_USER || 'no-reply@example.com'
+    const from =process.env.SMTP_GMAIL_USER
 
     return transporter.sendMail({
         from,
