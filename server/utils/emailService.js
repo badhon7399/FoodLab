@@ -1,20 +1,25 @@
 import nodemailer from 'nodemailer'
 
-// Creates a transporter using either Gmail SMTP (recommended with App Password)
-// or a generic SMTP server via EMAIL_SMTP_* variables.
+// Gmail/generic SMTP only (no external HTTP providers)
 function createTransporter() {
     const gmailUser = process.env.SMTP_GMAIL_USER
     const gmailPass = process.env.SMTP_GMAIL_PASS
+    const debug = String(process.env.EMAIL_DEBUG || '').toLowerCase() === 'true'
 
     if (gmailUser && gmailPass) {
-        // Gmail SMTP using App Password (preferred for simplicity)
+        // Prefer STARTTLS 587 to avoid 465 blocks; can override via SMTP_GMAIL_PORT
+        const port = Number(process.env.SMTP_GMAIL_PORT || 587)
+        const useSecure = port === 465
         return nodemailer.createTransport({
             host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
+            port,
+            secure: useSecure,
+            requireTLS: !useSecure,
             auth: { user: gmailUser, pass: gmailPass },
-            connectionTimeout: 10000,
-            socketTimeout: 10000,
+            connectionTimeout: Number(process.env.EMAIL_SMTP_TIMEOUT || 10000),
+            socketTimeout: Number(process.env.EMAIL_SMTP_TIMEOUT || 10000),
+            logger: debug,
+            debug,
         })
     }
 
@@ -28,19 +33,13 @@ function createTransporter() {
             : undefined,
         connectionTimeout: Number(process.env.EMAIL_SMTP_TIMEOUT || 10000),
         socketTimeout: Number(process.env.EMAIL_SMTP_TIMEOUT || 10000),
+        logger: debug,
+        debug,
     })
 }
 
 export async function sendEmail({ to, subject, text, html }) {
     const transporter = createTransporter()
-
-    const from =process.env.SMTP_GMAIL_USER
-
-    return transporter.sendMail({
-        from,
-        to,
-        subject,
-        text,
-        html,
-    })
+    const from = process.env.EMAIL_FROM || process.env.SMTP_GMAIL_USER || 'no-reply@example.com'
+    return transporter.sendMail({ from, to, subject, text, html })
 }
