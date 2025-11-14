@@ -13,6 +13,8 @@ function createTransporter() {
             port: 465,
             secure: true,
             auth: { user: gmailUser, pass: gmailPass },
+            connectionTimeout: 10000,
+            socketTimeout: 10000,
         })
     }
 
@@ -24,6 +26,8 @@ function createTransporter() {
         auth: process.env.EMAIL_SMTP_USER
             ? { user: process.env.EMAIL_SMTP_USER, pass: process.env.EMAIL_SMTP_PASS }
             : undefined,
+        connectionTimeout: Number(process.env.EMAIL_SMTP_TIMEOUT || 10000),
+        socketTimeout: Number(process.env.EMAIL_SMTP_TIMEOUT || 10000),
     })
 }
 

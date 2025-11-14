@@ -99,12 +99,22 @@ export const forgotPassword = asyncWrap(async (req, res) => {
         </div>
     `
 
-    await sendEmail({
+    // Attempt to send the email, but never block the response indefinitely
+    const sendPromise = sendEmail({
         to: user.email,
         subject: 'Reset your Food Lab password',
         html,
         text: `Reset your password: ${resetUrl}`,
     })
+
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timeout')), 12000))
+
+    try {
+        await Promise.race([sendPromise, timeout])
+    } catch (e) {
+        // Log and continue to avoid leaking existence of account and to prevent UI from hanging
+        console.warn('Email dispatch issue:', e?.message || e)
+    }
 
     res.json({ success: true, message: 'If that email exists, a reset link has been sent' })
 })
