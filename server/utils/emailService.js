@@ -8,7 +8,7 @@ function createTransporter() {
 
     if (gmailUser && gmailPass) {
         // Prefer STARTTLS 587 to avoid 465 blocks; can override via SMTP_GMAIL_PORT
-        const port = Number(process.env.SMTP_GMAIL_PORT || 587)
+        const port = Number(process.env.SMTP_GMAIL_PORT || 465)
         const useSecure = port === 465
         return nodemailer.createTransport({
             host: 'smtp.gmail.com',
