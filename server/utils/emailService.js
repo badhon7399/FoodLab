@@ -1,18 +1,39 @@
 import nodemailer from 'nodemailer'
 
-export async function sendEmail({ to, subject, text, html }) {
-    const transporter = nodemailer.createTransport({
+// Creates a transporter using either Gmail SMTP (recommended with App Password)
+// or a generic SMTP server via EMAIL_SMTP_* variables.
+function createTransporter() {
+    const gmailUser = process.env.SMTP_GMAIL_USER
+    const gmailPass = process.env.SMTP_GMAIL_PASS
+
+    if (gmailUser && gmailPass) {
+        // Gmail SMTP using App Password (preferred for simplicity)
+        return nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: { user: gmailUser, pass: gmailPass },
+        })
+    }
+
+    // Generic SMTP fallback
+    return nodemailer.createTransport({
         host: process.env.EMAIL_SMTP_HOST,
         port: Number(process.env.EMAIL_SMTP_PORT || 587),
-        secure: false,
-        auth: process.env.EMAIL_SMTP_USER ? {
-            user: process.env.EMAIL_SMTP_USER,
-            pass: process.env.EMAIL_SMTP_PASS,
-        } : undefined,
+        secure: String(process.env.EMAIL_SMTP_SECURE || '').toLowerCase() === 'true' || Number(process.env.EMAIL_SMTP_PORT) === 465,
+        auth: process.env.EMAIL_SMTP_USER
+            ? { user: process.env.EMAIL_SMTP_USER, pass: process.env.EMAIL_SMTP_PASS }
+            : undefined,
     })
+}
+
+export async function sendEmail({ to, subject, text, html }) {
+    const transporter = createTransporter()
+
+    const from = process.env.EMAIL_FROM || process.env.SMTP_GMAIL_USER || 'no-reply@example.com'
 
     return transporter.sendMail({
-        from: process.env.EMAIL_FROM,
+        from,
         to,
         subject,
         text,
