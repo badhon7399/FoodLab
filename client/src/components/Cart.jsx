@@ -16,13 +16,27 @@ import {
   HiCheckCircle,
 } from "react-icons/hi";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ModernCart = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { items, total } = useSelector((state) => state.cart);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState(null);
+
+  // Lock background scroll when cart is open
+  useEffect(() => {
+    if (isOpen) {
+      const htmlOverflow = document.documentElement.style.overflow;
+      const bodyOverflow = document.body.style.overflow;
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.documentElement.style.overflow = htmlOverflow;
+        document.body.style.overflow = bodyOverflow;
+      };
+    }
+  }, [isOpen]);
 
   const deliveryFee = total > 200 ? 0 : 30;
   const discount = appliedPromo ? total * 0.1 : 0;
