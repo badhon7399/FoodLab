@@ -16,33 +16,27 @@ const AboutUs = () => {
   // Team members
   const team = [
     {
-      name: "Ahmed Rahman",
+      name: "Sowkot Bhuiyan",
       role: "Founder & CEO",
       department: "CSE",
       image: "/team/ahmed.jpg",
       bio: "Passionate about bringing quality food to CUET students",
     },
     {
-      name: "Fatima Khan",
+      name: "Aroza Khanom Sathi",
       role: "Head Chef",
-      department: "EEE",
+      department: "",
       image: "/team/fatima.jpg",
       bio: "Creating delicious and hygienic meals",
     },
     {
-      name: "Rahul Das",
-      role: "Operations Manager",
-      department: "ME",
+      name: "Montasin Hossain Mahi",
+      role: "Co-founder",
+      department: "CSE",
       image: "/team/rahul.jpg",
       bio: "Ensuring smooth operations and timely delivery",
-    },
-    {
-      name: "Nadia Islam",
-      role: "Customer Relations",
-      department: "Architecture",
-      image: "/team/nadia.jpg",
-      bio: "Your satisfaction is our priority",
-    },
+    }
+
   ];
 
   // Core values
@@ -77,6 +71,21 @@ const AboutUs = () => {
       color: "from-purple-500 to-indigo-600",
       bgColor: "bg-purple-50",
     },
+    {
+      icon: HiTrendingUp,
+      title: "Growing Community",
+      description: "Building a loyal following of satisfied customers",
+      color: "from-blue-500 to-indigo-600",
+      bgColor: "bg-blue-50",
+    },
+    {
+      icon: HiAcademicCap,
+      title: "Student-Centric",
+      description: "Tailored services for CUET students",
+      color: "from-blue-500 to-indigo-600",
+      bgColor: "bg-blue-50",
+    },
+
   ];
 
   // Statistics
@@ -90,13 +99,13 @@ const AboutUs = () => {
   // Journey timeline
   const timeline = [
     {
-      year: "2022",
+      year: "2024",
       title: "The Beginning",
       description:
         "Started with a small food cart serving basic snacks to students",
     },
     {
-      year: "2023",
+      year: "2024",
       title: "Expansion",
       description: "Expanded menu and introduced online ordering system",
     },
@@ -114,7 +123,7 @@ const AboutUs = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-primary-50">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary-500 via-primary-600 to-orange-600 text-white overflow-hidden">
         {/* Background Pattern */}
@@ -193,7 +202,7 @@ const AboutUs = () => {
                   tasty, affordable, and hygienic meals on campus.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-6">
-                  What started as a small food cart in 2022 has grown into a
+                  What started as a small food cart in 2024 has grown into a
                   beloved campus institution. We began with just a few menu
                   items, but our commitment to{" "}
                   <strong>quality, hygiene, and customer satisfaction</strong>{" "}
@@ -201,7 +210,7 @@ const AboutUs = () => {
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   Today, Food Lab serves over{" "}
-                  <strong>500 students daily</strong>, delivering everything
+                  <strong>100 students daily</strong>, delivering everything
                   from quick snacks to full meals. We've embraced technology to
                   make ordering convenient, but we've never compromised on what
                   matters most: <strong>delicious food made with care</strong>.
@@ -255,12 +264,9 @@ const AboutUs = () => {
               Our Values
             </h2>
             <div className="w-20 h-1 bg-primary-500 mx-auto mb-6" />
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              These core principles guide everything we do at Food Lab
-            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {values.map((value, index) => (
               <motion.div
                 key={value.title}
@@ -269,22 +275,19 @@ const AboutUs = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -10 }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden"
+                className="bg-white/80 backdrop-blur rounded-2xl shadow-lg overflow-hidden"
               >
                 <div className={`h-2 bg-gradient-to-r ${value.color}`} />
-                <div className="p-6">
+                <div className="p-6 flex-1 flex flex-col">
                   <div
-                    className={`${value.bgColor} w-16 h-16 rounded-2xl flex items-center justify-center mb-4`}
+                    className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-r ${value.color}`}
                   >
-                    <value.icon
-                      className={`w-8 h-8 bg-gradient-to-r ${value.color} bg-clip-text text-transparent`}
-                      style={{ WebkitTextFillColor: "transparent" }}
-                    />
+                    <value.icon className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">
                     {value.title}
                   </h3>
-                  <p className="text-gray-600">{value.description}</p>
+                  <p className="text-gray-700">{value.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -293,7 +296,7 @@ const AboutUs = () => {
       </section>
 
       {/* Journey Timeline */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-orange-50 to-primary-50">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -368,7 +371,7 @@ const AboutUs = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center max-w-5xl mx-auto">
             {team.map((member, index) => (
               <motion.div
                 key={member.name}
@@ -376,7 +379,7 @@ const AboutUs = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden group"
+                className="bg-white rounded-2xl shadow-lg overflow-hidden group flex flex-col h-full w-full"
               >
                 <div className="relative h-64 bg-gradient-to-br from-primary-500 to-primary-600 overflow-hidden">
                   {/* Placeholder for team member image */}
@@ -411,7 +414,7 @@ const AboutUs = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-primary-50 to-orange-50">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <motion.div

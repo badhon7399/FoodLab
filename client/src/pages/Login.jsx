@@ -7,11 +7,9 @@ import {
   HiLockClosed,
   HiEye,
   HiEyeOff,
-  HiCheckCircle,
   HiExclamation,
   HiArrowRight,
 } from 'react-icons/hi';
-import { FaGoogle, FaFacebookF } from 'react-icons/fa';
 import { login } from '../redux/slices/authSlice';
 
 const Login = () => {
@@ -94,7 +92,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-orange-600 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-orange-600 flex items-center justify-center p-4 pt-24 md:pt-28">
       {/* Background Animation */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" />
@@ -291,28 +289,6 @@ const Login = () => {
                 )}
               </button>
             </form>
-
-            {/* Divider */}
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            {/* Social Login */}
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                <FaGoogle className="w-5 h-5 text-red-500" />
-                <span className="font-semibold text-gray-700">Google</span>
-              </button>
-              <button className="flex items-center justify-center space-x-2 px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                <FaFacebookF className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-gray-700">Facebook</span>
-              </button>
-            </div>
 
             {/* Sign Up Link */}
             <p className="mt-8 text-center text-gray-600">

@@ -114,7 +114,7 @@ const ContactUs = () => {
     {
       question: "How can I cancel my order?",
       answer:
-        "You can cancel your order within 5 minutes of placement through your orders page.",
+        "You can cancel your order within 5 minutes of placement through your orders page in your profile.",
     },
     {
       question: "Do you offer student discounts?",
@@ -528,7 +528,7 @@ const ContactUs = () => {
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          {/* <div className="text-center mt-12">
             <p className="text-gray-600 mb-4">Still have questions?</p>
             <a
               href="#contact-form"
@@ -536,7 +536,7 @@ const ContactUs = () => {
             >
               Contact Us
             </a>
-          </div>
+          </div> */}
         </div>
       </section>
 

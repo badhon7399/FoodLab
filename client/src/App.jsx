@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import AdminLayout from "./components/admin/AdminLayout.jsx";
 import PublicLayout from "./components/PublicLayout.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
@@ -13,32 +13,43 @@ import PromoCodes from "./pages/admin/PromoCodes.jsx";
 import Delivery from "./pages/admin/Delivery.jsx";
 import Settings from "./pages/admin/Settings.jsx";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
-    <Routes>
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="orders" element={<OrderManagement />} />
-        <Route path="menu" element={<MenuManagement />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="transactions" element={<Transactions />} />
-        <Route path="reviews" element={<Reviews />} />
-        <Route path="promo-codes" element={<PromoCodes />} />
-        <Route path="delivery" element={<Delivery />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="orders" element={<OrderManagement />} />
+          <Route path="menu" element={<MenuManagement />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="transactions" element={<Transactions />} />
+          <Route path="reviews" element={<Reviews />} />
+          <Route path="promo-codes" element={<PromoCodes />} />
+          <Route path="delivery" element={<Delivery />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
 
-      {/* Public Routes */}
-      <Route
-        path="/*"
-        element={
-          <PublicLayout isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} />
-        }
-      />
-    </Routes>
+        {/* Public Routes */}
+        <Route
+          path="/*"
+          element={
+            <PublicLayout isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} />
+          }
+        />
+      </Routes>
+    </>
   );
 }
