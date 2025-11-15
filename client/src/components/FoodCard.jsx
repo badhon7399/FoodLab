@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/slices/cartSlice.js";
-import { HiStar, HiPlus, HiHeart } from "react-icons/hi";
+import { HiStar, HiPlus, HiHeart, HiShoppingCart } from "react-icons/hi";
 import { BsFire } from "react-icons/bs";
 import { useState } from "react";
 
@@ -115,12 +115,16 @@ const FoodCard = ({ food: incomingFood }) => {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleAddToCart}
-            className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-3 rounded-xl shadow-lg hover:shadow-glow transition-all"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg hover:from-primary-600 hover:to-primary-700 hover:shadow-glow active:scale-95 transition-all"
+            aria-label="Add to cart"
+            title="Add to cart"
           >
-            <HiPlus className="w-5 h-5" />
+            <HiShoppingCart className="w-5 h-5" />
+            <span className="hidden sm:inline">Add to Cart</span>
+            <span className="sm:hidden">Add</span>
           </motion.button>
         </div>
       </div>
