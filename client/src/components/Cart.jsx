@@ -53,7 +53,7 @@ const ModernCart = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-white shadow-2xl z-50 flex flex-col overflow-x-hidden"
+            className="fixed inset-0 h-full w-full md:right-0 md:inset-auto md:w-[480px] bg-white shadow-2xl z-50 flex flex-col overflow-x-hidden overflow-y-auto md:overflow-y-hidden"
           >
             {/* Header */}
             <div className="relative bg-gradient-to-r from-primary-500 to-primary-600 p-6 text-white">
@@ -102,7 +102,7 @@ const ModernCart = ({ isOpen, onClose }) => {
             </div>
 
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+            <div className="p-6 space-y-4 bg-gray-50 md:flex-1 md:overflow-y-auto">
               {items.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
