@@ -112,7 +112,6 @@ const promoCodeSchema = new mongoose.Schema(
 );
 
 // Indexes
-promoCodeSchema.index({ code: 1 });
 promoCodeSchema.index({ isActive: 1 });
 promoCodeSchema.index({ validFrom: 1, validUntil: 1 });
 

@@ -23,7 +23,7 @@ const AboutUs = () => {
       bio: "Passionate about bringing quality food to CUET students",
     },
     {
-      name: "Aroza Khanom Sathi",
+      name: "Afroza Khanom Sathi",
       role: "Head Chef",
       department: "",
       image: "/team/fatima.jpg",

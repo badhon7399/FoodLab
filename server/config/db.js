@@ -11,7 +11,8 @@ export default async function connectDb() {
 
     try {
         await mongoose.connect(uri, {
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 15000,
+            family: 4,
         })
         console.log('✅ MongoDB connected successfully')
     } catch (error) {
