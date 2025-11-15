@@ -144,7 +144,7 @@ const AboutUs = () => {
               </h1>
               <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
                 Serving delicious, hygienic, and affordable food to the CUET
-                community since 2022
+                community since 2024
               </p>
               <div className="flex items-center justify-center space-x-2 text-yellow-300">
                 <HiSparkles className="w-6 h-6" />
