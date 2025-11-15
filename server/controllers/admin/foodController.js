@@ -13,6 +13,16 @@ export const getAllFoodItems = asyncHandler(async (req, res) => {
 // @route   POST /api/admin/food
 // @access  Private/Admin
 export const createFoodItem = asyncHandler(async (req, res) => {
+  // If multiple images are provided, set primary image fields
+  if (Array.isArray(req.body.images) && req.body.images.length > 0) {
+    const idx = Number(req.body.primaryImageIndex ?? 0) || 0;
+    const primary = req.body.images[idx] || req.body.images[0];
+    if (primary?.url) {
+      req.body.image = primary.url;
+      req.body.imagePublicId = primary.publicId;
+    }
+  }
+
   const food = await Food.create(req.body);
 
   res.status(201).json({
@@ -31,6 +41,16 @@ export const updateFoodItem = asyncHandler(async (req, res) => {
   if (!food) {
     res.status(404);
     throw new Error('Food item not found');
+  }
+
+  // If multiple images are provided, set primary image fields before updating
+  if (Array.isArray(req.body.images) && req.body.images.length > 0) {
+    const idx = Number(req.body.primaryImageIndex ?? 0) || 0;
+    const primary = req.body.images[idx] || req.body.images[0];
+    if (primary?.url) {
+      req.body.image = primary.url;
+      req.body.imagePublicId = primary.publicId;
+    }
   }
 
   // If image is being updated, delete old image from Cloudinary

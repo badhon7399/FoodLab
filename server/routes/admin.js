@@ -1,7 +1,7 @@
 import express from 'express';
 import { protect, admin } from '../middleware/auth.js';
 import { advancedFilter } from '../middleware/queryFilter.js';
-import { uploadSingleFoodImage } from '../middleware/upload.js';
+import { uploadSingleFoodImage, uploadMultipleFoodImages } from '../middleware/upload.js';
 
 // Import models
 import Order from '../models/Order.js';
@@ -116,9 +116,9 @@ router.delete('/orders/bulk', bulkDeleteOrders);
 
 // ========== Food/Menu Routes ==========
 router.get('/food', advancedFilter(Food), getAllFoodItems);
-router.post('/food', uploadSingleFoodImage, createFoodItem);
+router.post('/food', uploadMultipleFoodImages, createFoodItem);
 router.post('/food/upload', uploadSingleFoodImage, uploadFoodImage);
-router.put('/food/:id', uploadSingleFoodImage, updateFoodItem);
+router.put('/food/:id', uploadMultipleFoodImages, updateFoodItem);
 router.put('/food/bulk/availability', bulkUpdateAvailability);
 router.delete('/food/:id', deleteFoodItem);
 router.delete('/food/bulk', bulkDeleteFoodItems);

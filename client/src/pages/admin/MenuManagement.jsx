@@ -34,6 +34,9 @@ const MenuManagement = () => {
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [imagesFiles, setImagesFiles] = useState([]);
+  const [imagesPreview, setImagesPreview] = useState([]);
+  const [primaryImageIndex, setPrimaryImageIndex] = useState(0);
 
   // Toasts
   const [toasts, setToasts] = useState([]);
@@ -103,7 +106,8 @@ const MenuManagement = () => {
     e.preventDefault();
 
     try {
-      const isMultipart = !!imageFile;
+      const hasMultiple = imagesFiles.length > 0;
+      const isMultipart = hasMultiple || !!imageFile;
       let payload;
 
       if (isMultipart) {
@@ -116,7 +120,11 @@ const MenuManagement = () => {
         payload.append("isFeatured", String(formData.isFeatured));
         payload.append("isPopular", String(formData.isPopular));
         payload.append("isNewArrival", String(formData.isNewArrival));
-        if (imageFile) {
+
+        if (hasMultiple) {
+          imagesFiles.forEach((file) => payload.append("images", file));
+          payload.append("primaryImageIndex", String(primaryImageIndex || 0));
+        } else if (imageFile) {
           payload.append("image", imageFile);
         }
         // Do NOT set Content-Type manually; let Axios/browser set the boundary.
@@ -197,6 +205,9 @@ const MenuManagement = () => {
     });
     setImageFile(null);
     setImagePreview("");
+    setImagesFiles([]);
+    setImagesPreview([]);
+    setPrimaryImageIndex(0);
   };
 
   return (
@@ -451,28 +462,29 @@ const MenuManagement = () => {
                   </div>
                 </div>
 
-                {/* Image (file upload or URL fallback) */}
+                {/* Images (multiple upload) with primary selection and URL fallback */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Image
+                    Images
                   </label>
                   <div className="flex flex-col gap-3">
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        setImageFile(file || null);
-                        if (file) {
-                          setImagePreview(URL.createObjectURL(file));
-                        } else {
-                          setImagePreview("");
-                        }
+                        const files = Array.from(e.target.files || []);
+                        setImagesFiles(files);
+                        setImagesPreview(files.map((f) => URL.createObjectURL(f)));
+                        setPrimaryImageIndex(0);
+                        // Keep legacy single states cleared when selecting multiple
+                        setImageFile(null);
+                        setImagePreview("");
                       }}
                       className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none"
                     />
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Or use URL</span>
+                      <span className="text-xs text-gray-500">Or primary image URL</span>
                       <input
                         type="text"
                         value={formData.image}
@@ -482,12 +494,34 @@ const MenuManagement = () => {
                       />
                     </div>
                   </div>
-                  {(imagePreview || formData.image) && (
-                    <img
-                      src={imagePreview || formData.image}
-                      alt="Preview"
-                      className="mt-3 w-full h-48 object-cover rounded-xl"
-                    />
+
+                  {/* Multiple previews with primary selection */}
+                  {imagesPreview.length > 0 ? (
+                    <div className="mt-3 grid grid-cols-3 md:grid-cols-5 gap-3">
+                      {imagesPreview.map((src, idx) => (
+                        <label key={idx} className={`relative rounded-xl overflow-hidden border-2 ${primaryImageIndex === idx ? 'border-primary-500' : 'border-transparent'}`}>
+                          <img src={src} alt={`preview-${idx}`} className="w-full h-24 object-cover" />
+                          <input
+                            type="radio"
+                            name="primaryImage"
+                            className="absolute top-2 left-2"
+                            checked={primaryImageIndex === idx}
+                            onChange={() => setPrimaryImageIndex(idx)}
+                          />
+                          {primaryImageIndex === idx && (
+                            <span className="absolute bottom-2 left-2 bg-primary-600 text-white text-xs px-2 py-0.5 rounded">Primary</span>
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    (imagePreview || formData.image) && (
+                      <img
+                        src={imagePreview || formData.image}
+                        alt="Preview"
+                        className="mt-3 w-full h-48 object-cover rounded-xl"
+                      />
+                    )
                   )}
                 </div>
 

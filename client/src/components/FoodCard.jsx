@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/slices/cartSlice.js";
+import { toggleFavorite } from "../redux/slices/favoritesSlice.js";
 import { HiStar, HiPlus, HiHeart, HiShoppingCart } from "react-icons/hi";
 import { BsFire } from "react-icons/bs";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FoodCard = ({ food: incomingFood }) => {
   const dispatch = useDispatch();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
 
   const food = incomingFood || {
     _id: "demo",
@@ -17,6 +19,13 @@ const FoodCard = ({ food: incomingFood }) => {
     category: "Others",
     rating: 4.5,
     price: 199,
+  };
+
+  const isFav = useSelector((s) => s.favorites.ids.includes(food?._id));
+
+  const goToDetail = () => {
+    if (!food?._id) return;
+    navigate(`/food/${food._id}`);
   };
 
   const handleAddToCart = () => {
@@ -33,7 +42,7 @@ const FoodCard = ({ food: incomingFood }) => {
       className="group relative bg-white rounded-2xl shadow-card hover:shadow-card-hover overflow-hidden"
     >
       {/* Image Container */}
-      <div className="relative h-56 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+      <div className="relative h-56 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 cursor-pointer" onClick={goToDetail}>
         <img
           src={food.image}
           alt={food.name}
@@ -56,16 +65,15 @@ const FoodCard = ({ food: incomingFood }) => {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsFavorite(!isFavorite)}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (food?._id) dispatch(toggleFavorite(food._id));
+            }}
             className={`ml-auto p-2 rounded-full backdrop-blur-lg transition-all ${
-              isFavorite
-                ? "bg-accent-red text-white"
-                : "bg-white/80 text-gray-600"
+              isFav ? "bg-accent-red text-white" : "bg-white/80 text-gray-600"
             }`}
           >
-            <HiHeart
-              className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`}
-            />
+            <HiHeart className={`w-5 h-5 ${isFav ? "fill-current" : ""}`} />
           </motion.button>
         </div>
 
@@ -80,7 +88,10 @@ const FoodCard = ({ food: incomingFood }) => {
           {food.category}
         </span>
 
-        <h3 className="font-heading font-bold text-xl mt-2 mb-2 text-dark group-hover:text-primary-500 transition-colors">
+        <h3
+          className="font-heading font-bold text-xl mt-2 mb-2 text-dark group-hover:text-primary-500 transition-colors cursor-pointer"
+          onClick={goToDetail}
+        >
           {food.name}
         </h3>
 
@@ -135,7 +146,10 @@ const FoodCard = ({ food: incomingFood }) => {
         whileHover={{ opacity: 1 }}
         className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
       >
-        <button className="bg-white text-dark px-6 py-3 rounded-full font-semibold shadow-2xl pointer-events-auto hover:bg-gray-50 transition-colors">
+        <button
+          onClick={goToDetail}
+          className="bg-white text-dark px-6 py-3 rounded-full font-semibold shadow-2xl pointer-events-auto hover:bg-gray-50 transition-colors"
+        >
           Quick View
         </button>
       </motion.div>

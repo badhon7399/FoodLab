@@ -15,6 +15,7 @@ import ForgotPassword from "../pages/ForgotPassword.jsx";
 import ResetPassword from "../pages/ResetPassword.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import OrderSuccess from "../pages/OrderSuccess.jsx";
+import FoodDetail from "../pages/FoodDetail.jsx";
 
 export default function PublicLayout({ isCartOpen, setIsCartOpen }) {
   return (
@@ -54,6 +55,7 @@ export default function PublicLayout({ isCartOpen, setIsCartOpen }) {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/food/:id" element={<FoodDetail />} />
           <Route
             path="/profile"
             element={
