@@ -53,7 +53,7 @@ const ModernCart = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-white shadow-2xl z-50 flex flex-col"
+            className="fixed right-0 top-0 h-full w-full md:w-[480px] bg-white shadow-2xl z-50 flex flex-col overflow-x-hidden"
           >
             {/* Header */}
             <div className="relative bg-gradient-to-r from-primary-500 to-primary-600 p-6 text-white">
@@ -136,9 +136,9 @@ const ModernCart = ({ isOpen, onClose }) => {
                       transition={{ delay: index * 0.05 }}
                       className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         {/* Item Image */}
-                        <div className="relative">
+                        <div className="relative flex-shrink-0 self-center sm:self-auto">
                           <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100">
                             <img
                               src={item.image}
@@ -173,7 +173,7 @@ const ModernCart = ({ isOpen, onClose }) => {
                           </div>
 
                           {/* Price & Quantity */}
-                          <div className="flex justify-between items-end">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3">
                             <div className="text-primary-500 font-bold text-xl">
                               ৳{item.price * item.quantity}
                               <span className="text-sm text-gray-500 font-normal ml-1">
@@ -250,7 +250,7 @@ const ModernCart = ({ isOpen, onClose }) => {
                     <HiTag className="w-4 h-4" />
                     <span>Promo Code</span>
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       value={promoCode}
@@ -263,7 +263,7 @@ const ModernCart = ({ isOpen, onClose }) => {
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={handleApplyPromo}
-                      className="px-6 py-2 bg-primary-500 text-white rounded-lg font-semibold hover:bg-primary-600 transition-colors"
+                      className="px-6 py-2 bg-primary-500 text-white rounded-lg font-semibold hover:bg-primary-600 transition-colors w-full sm:w-auto"
                     >
                       Apply
                     </motion.button>
