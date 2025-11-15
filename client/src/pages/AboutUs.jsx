@@ -123,7 +123,7 @@ const AboutUs = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-primary-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-primary-50 overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary-500 via-primary-600 to-orange-600 text-white overflow-hidden">
         {/* Background Pattern */}
@@ -160,6 +160,7 @@ const AboutUs = () => {
         {/* Wave Divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg
+            className="w-full"
             viewBox="0 0 1440 120"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -321,13 +322,13 @@ const AboutUs = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.2 }}
-                className={`flex items-center mb-12 ${
-                  index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+                className={`flex flex-col md:flex-row items-stretch md:items-center mb-12 ${
+                  index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
                 }`}
               >
                 <div
-                  className={`flex-1 ${
-                    index % 2 === 0 ? "text-right pr-8" : "text-left pl-8"
+                  className={`flex-1 text-left ${
+                    index % 2 === 0 ? "md:text-right md:pr-8" : "md:text-left md:pl-8"
                   }`}
                 >
                   <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -343,7 +344,7 @@ const AboutUs = () => {
                 <div className="relative flex items-center justify-center">
                   <div className="w-4 h-4 bg-primary-500 rounded-full z-10" />
                   {index < timeline.length - 1 && (
-                    <div className="absolute top-4 w-1 h-24 bg-primary-200" />
+                    <div className="absolute top-4 w-1 h-24 bg-primary-200 hidden md:block" />
                   )}
                 </div>
                 <div className="flex-1" />

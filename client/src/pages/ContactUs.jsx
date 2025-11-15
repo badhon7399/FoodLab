@@ -165,7 +165,7 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary-500 via-primary-600 to-orange-600 text-white overflow-hidden">
         {/* Background Pattern */}
@@ -195,6 +195,7 @@ const ContactUs = () => {
         {/* Wave Divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg
+            className="w-full"
             viewBox="0 0 1440 120"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +211,7 @@ const ContactUs = () => {
       {/* Contact Info Cards */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 -mt-32 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 -mt-8 md:-mt-24 lg:-mt-32 relative z-10">
             {contactInfo.map((info, index) => (
               <motion.div
                 key={info.title}
