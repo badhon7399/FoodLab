@@ -113,11 +113,12 @@ connectDb()
         })
 
         initializeSocket(io)
+        app.set('io', io)
 
         server.listen(port, () => {
             console.log(`✅ Server running on port ${port}`)
         })
-        
+
         server.on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 console.error(`❌ Port ${port} is already in use.`)

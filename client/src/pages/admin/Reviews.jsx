@@ -55,8 +55,9 @@ const Reviews = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
-      setReviews(data);
-      setFilteredReviews(data);
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+      setReviews(list);
+      setFilteredReviews(list);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     }
@@ -159,51 +160,15 @@ const Reviews = () => {
         {[...Array(5)].map((_, index) => (
           <HiStar
             key={index}
-            className={`${sizeClasses[size]} ${
-              index < rating ? "text-yellow-400 fill-current" : "text-gray-300"
-            }`}
+            className={`${sizeClasses[size]} ${index < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+              }`}
           />
         ))}
       </div>
     );
   };
 
-  // Sample data for demonstration
-  const sampleReviews = [
-    {
-      _id: "1",
-      user: { name: "John Doe", avatar: "JD" },
-      food: { name: "Chicken Pizza", image: "/pizza.jpg" },
-      rating: 5,
-      comment:
-        "Absolutely delicious! Best pizza on campus. The chicken was perfectly cooked and the cheese was amazing.",
-      isApproved: true,
-      createdAt: new Date().toISOString(),
-      reply: null,
-    },
-    {
-      _id: "2",
-      user: { name: "Jane Smith", avatar: "JS" },
-      food: { name: "Beef Burger", image: "/burger.jpg" },
-      rating: 4,
-      comment:
-        "Great burger! Would have given 5 stars but the delivery was a bit slow.",
-      isApproved: true,
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      reply:
-        "Thank you for your feedback! We are working on improving our delivery times.",
-    },
-    {
-      _id: "3",
-      user: { name: "Mike Johnson", avatar: "MJ" },
-      food: { name: "Chicken Shawarma", image: "/shawarma.jpg" },
-      rating: 3,
-      comment: "It was okay. Expected better quality for the price.",
-      isApproved: false,
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      reply: null,
-    },
-  ];
+  // ... (StarRating component)
 
   return (
     <div className="space-y-6">
@@ -225,7 +190,11 @@ const Reviews = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-yellow-100 text-sm">Average Rating</p>
-              <h3 className="text-3xl font-bold mt-2">4.6</h3>
+              <h3 className="text-3xl font-bold mt-2">
+                {reviews.length > 0
+                  ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+                  : "0.0"}
+              </h3>
             </div>
             <HiStar className="w-12 h-12 text-white/30" />
           </div>
@@ -236,29 +205,37 @@ const Reviews = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Total Reviews</p>
-              <h3 className="text-3xl font-bold mt-2">842</h3>
+              <h3 className="text-3xl font-bold mt-2">{reviews.length}</h3>
             </div>
             <HiCheckCircle className="w-12 h-12 text-white/30" />
           </div>
-          <p className="text-sm text-green-100 mt-2">+23 this week</p>
+          <p className="text-sm text-green-100 mt-2">All time</p>
         </div>
 
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm">Approved</p>
-              <h3 className="text-3xl font-bold mt-2">789</h3>
+              <h3 className="text-3xl font-bold mt-2">
+                {reviews.filter(r => r.isApproved).length}
+              </h3>
             </div>
             <HiCheckCircle className="w-12 h-12 text-white/30" />
           </div>
-          <p className="text-sm text-blue-100 mt-2">93.7% approval rate</p>
+          <p className="text-sm text-blue-100 mt-2">
+            {reviews.length > 0
+              ? ((reviews.filter(r => r.isApproved).length / reviews.length) * 100).toFixed(1)
+              : "0"}% approval rate
+          </p>
         </div>
 
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100 text-sm">Pending</p>
-              <h3 className="text-3xl font-bold mt-2">53</h3>
+              <h3 className="text-3xl font-bold mt-2">
+                {reviews.filter(r => !r.isApproved).length}
+              </h3>
             </div>
             <HiFilter className="w-12 h-12 text-white/30" />
           </div>
@@ -273,8 +250,8 @@ const Reviews = () => {
         </h2>
         <div className="space-y-3">
           {[5, 4, 3, 2, 1].map((rating) => {
-            const count = Math.floor(Math.random() * 200) + 50;
-            const percentage = (count / 842) * 100;
+            const count = reviews.filter(r => r.rating === rating).length;
+            const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
             return (
               <div key={rating} className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2 w-24">
@@ -347,7 +324,7 @@ const Reviews = () => {
 
       {/* Reviews List */}
       <div className="space-y-4">
-        {sampleReviews.map((review) => (
+        {filteredReviews.map((review) => (
           <motion.div
             key={review._id}
             initial={{ opacity: 0, y: 20 }}
@@ -370,11 +347,10 @@ const Reviews = () => {
                       </h3>
                       <StarRating rating={review.rating} />
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          review.isApproved
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${review.isApproved
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                          }`}
                       >
                         {review.isApproved ? "Approved" : "Pending"}
                       </span>
@@ -440,11 +416,10 @@ const Reviews = () => {
                     onClick={() =>
                       toggleReviewStatus(review._id, review.isApproved)
                     }
-                    className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                      review.isApproved
-                        ? "text-yellow-600 hover:bg-yellow-50"
-                        : "text-green-600 hover:bg-green-50"
-                    }`}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-colors ${review.isApproved
+                      ? "text-yellow-600 hover:bg-yellow-50"
+                      : "text-green-600 hover:bg-green-50"
+                      }`}
                   >
                     {review.isApproved ? "Unapprove" : "Approve"}
                   </button>
@@ -598,15 +573,13 @@ const Reviews = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.6 }}
-              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${
-                t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
-              }`}
+              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
+                }`}
             >
               <div className="relative">
                 <div
-                  className={`absolute left-0 top-0 h-full w-1 ${
-                    t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
-                  }`}
+                  className={`absolute left-0 top-0 h-full w-1 ${t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
+                    }`}
                 />
                 <div className="p-3 pl-4 pr-10 flex items-start gap-3">
                   <div className="mt-0.5 shrink-0">

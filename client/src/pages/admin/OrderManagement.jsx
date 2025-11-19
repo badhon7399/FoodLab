@@ -84,7 +84,7 @@ const OrderManagement = () => {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/admin/orders/${orderId}`,
+        `${import.meta.env.VITE_API_URL}/admin/orders/${orderId}/status`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -150,11 +150,10 @@ const OrderManagement = () => {
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  statusFilter === status
+                className={`p-4 rounded-xl border-2 transition-all ${statusFilter === status
                     ? "border-primary-500 bg-primary-50"
                     : "border-gray-200 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 <p className="text-2xl font-bold text-gray-900">
                   {status === "All"
@@ -237,20 +236,18 @@ const OrderManagement = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                          order.paymentStatus === "Completed"
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${order.paymentStatus === "Completed"
                             ? "bg-green-100 text-green-700"
                             : "bg-yellow-100 text-yellow-700"
-                        }`}
+                          }`}
                       >
                         {order.paymentStatus}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold border ${
-                          statusColors[order.status]
-                        }`}
+                        className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[order.status]
+                          }`}
                       >
                         <StatusIcon className="w-4 h-4" />
                         <span>{order.status}</span>
@@ -426,11 +423,10 @@ const OrderManagement = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Payment Status</span>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          selectedOrder.paymentStatus === "Completed"
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedOrder.paymentStatus === "Completed"
                             ? "bg-green-100 text-green-700"
                             : "bg-yellow-100 text-yellow-700"
-                        }`}
+                          }`}
                       >
                         {selectedOrder.paymentStatus}
                       </span>
@@ -456,11 +452,10 @@ const OrderManagement = () => {
                         onClick={() =>
                           updateOrderStatus(selectedOrder._id, status)
                         }
-                        className={`p-3 rounded-xl border-2 font-semibold transition-all ${
-                          selectedOrder.status === status
+                        className={`p-3 rounded-xl border-2 font-semibold transition-all ${selectedOrder.status === status
                             ? "border-primary-500 bg-primary-50 text-primary-600"
                             : "border-gray-200 hover:border-gray-300 text-gray-700"
-                        }`}
+                          }`}
                       >
                         {status}
                       </button>

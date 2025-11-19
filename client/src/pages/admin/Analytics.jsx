@@ -35,81 +35,85 @@ import api from "../../utils/api";
 
 const Analytics = () => {
   const [timeRange, setTimeRange] = useState("7days");
+  const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({
     totalRevenue: 0,
     totalOrders: 0,
     averageOrderValue: 0,
     growthRate: 0,
+    newCustomers: 0,
+    returningCustomers: 0,
   });
 
-  // Sample data - replace with real API data
-  const revenueData = [
-    { date: "2024-01-01", revenue: 4000, orders: 24, customers: 18 },
-    { date: "2024-01-02", revenue: 3000, orders: 18, customers: 15 },
-    { date: "2024-01-03", revenue: 5000, orders: 32, customers: 25 },
-    { date: "2024-01-04", revenue: 2780, orders: 20, customers: 17 },
-    { date: "2024-01-05", revenue: 6890, orders: 45, customers: 35 },
-    { date: "2024-01-06", revenue: 8390, orders: 52, customers: 42 },
-    { date: "2024-01-07", revenue: 7490, orders: 48, customers: 38 },
-  ];
-
-  const categoryPerformance = [
-    { category: "Pizza", sales: 45000, orders: 320, growth: 12.5 },
-    { category: "Burger", sales: 32000, orders: 280, growth: 8.3 },
-    { category: "Shawarma", sales: 28000, orders: 250, growth: 15.7 },
-    { category: "Momo", sales: 18000, orders: 180, growth: 5.2 },
-    { category: "Dessert", sales: 15000, orders: 150, growth: -2.1 },
-    { category: "Drinks", sales: 12000, orders: 200, growth: 3.8 },
-  ];
-
-  const hourlyData = [
-    { hour: "8 AM", orders: 5 },
-    { hour: "9 AM", orders: 12 },
-    { hour: "10 AM", orders: 18 },
-    { hour: "11 AM", orders: 25 },
-    { hour: "12 PM", orders: 45 },
-    { hour: "1 PM", orders: 52 },
-    { hour: "2 PM", orders: 38 },
-    { hour: "3 PM", orders: 28 },
-    { hour: "4 PM", orders: 22 },
-    { hour: "5 PM", orders: 35 },
-    { hour: "6 PM", orders: 48 },
-    { hour: "7 PM", orders: 55 },
-    { hour: "8 PM", orders: 42 },
-    { hour: "9 PM", orders: 30 },
-  ];
-
-  const topProducts = [
-    { name: "Chicken Pizza", value: 35, color: "#f97316" },
-    { name: "Beef Burger", value: 25, color: "#10b981" },
-    { name: "Shawarma", value: 20, color: "#3b82f6" },
-    { name: "Momo", value: 12, color: "#f59e0b" },
-    { name: "Others", value: 8, color: "#8b5cf6" },
-  ];
-
-  const customerSatisfaction = [
-    { subject: "Food Quality", value: 95, fullMark: 100 },
-    { subject: "Delivery Speed", value: 88, fullMark: 100 },
-    { subject: "Price", value: 82, fullMark: 100 },
-    { subject: "Packaging", value: 90, fullMark: 100 },
-    { subject: "Service", value: 92, fullMark: 100 },
-  ];
+  const [revenueData, setRevenueData] = useState([]);
+  const [categoryPerformance, setCategoryPerformance] = useState([]);
+  const [hourlyData, setHourlyData] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [customerSatisfaction, setCustomerSatisfaction] = useState([]);
+  const [insights, setInsights] = useState({
+    peakTimes: [],
+    topCategory: "N/A",
+    bestSellingProduct: "N/A",
+  });
 
   useEffect(() => {
     fetchAnalytics();
   }, [timeRange]);
 
   const fetchAnalytics = async () => {
+    setLoading(true);
     try {
       const { data } = await api.get(`/admin/analytics?range=${timeRange}`);
-      // Handle both response formats: { success: true, data: {...} } or direct data
-      if (data.data) {
-        setAnalytics(data.data.summary || data.data);
-      } else {
-        setAnalytics(data);
+
+      if (data.success && data.data) {
+        const d = data.data;
+        setAnalytics(d.summary || {});
+        setRevenueData(d.revenueData || []);
+        setCategoryPerformance(d.categoryPerformance || []);
+
+        // Format hourly data
+        const formattedHourly = (d.hourlyPattern || []).map(item => {
+          const hour = item.hour;
+          const ampm = hour >= 12 ? 'PM' : 'AM';
+          const hour12 = hour % 12 || 12;
+          return {
+            ...item,
+            hour: `${hour12} ${ampm}`
+          };
+        });
+        setHourlyData(formattedHourly);
+
+        // Format top products with colors and value
+        const COLORS = ["#f97316", "#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ec4899"];
+        const formattedProducts = (d.topProducts || []).map((item, index) => ({
+          ...item,
+          value: item.revenue, // Use revenue for the pie chart
+          color: COLORS[index % COLORS.length]
+        }));
+        setTopProducts(formattedProducts);
+
+        // Format satisfaction data for radar chart
+        if (d.satisfaction) {
+          const satisfactionData = [
+            { subject: "Food Quality", value: 95, fullMark: 100 },
+            { subject: "Delivery Speed", value: 88, fullMark: 100 },
+            { subject: "Price", value: 82, fullMark: 100 },
+            { subject: "Packaging", value: 90, fullMark: 100 },
+            { subject: "Service", value: 92, fullMark: 100 },
+          ];
+          setCustomerSatisfaction(satisfactionData);
+        }
+
+        setInsights(d.insights || {
+          peakTimes: [],
+          topCategory: "N/A",
+          bestSellingProduct: "N/A",
+        });
       }
     } catch (error) {
       console.error("Error fetching analytics:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -272,9 +276,9 @@ const Analytics = () => {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis 
-              dataKey="date" 
-              stroke="#888" 
+            <XAxis
+              dataKey="date"
+              stroke="#888"
               tick={{ fontSize: 12 }}
               angle={-45}
               textAnchor="end"
@@ -332,9 +336,8 @@ const Analytics = () => {
                       ৳{cat.sales.toLocaleString()}
                     </span>
                     <span
-                      className={`text-xs md:text-sm font-semibold ${
-                        cat.growth >= 0 ? "text-green-500" : "text-red-500"
-                      }`}
+                      className={`text-xs md:text-sm font-semibold ${cat.growth >= 0 ? "text-green-500" : "text-red-500"
+                        }`}
                     >
                       {cat.growth >= 0 ? "+" : ""}
                       {cat.growth}%
