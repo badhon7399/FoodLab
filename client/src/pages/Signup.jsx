@@ -154,9 +154,7 @@ const Signup = () => {
     try {
       await dispatch(register(formData)).unwrap();
       // Show success message and redirect
-      navigate('/login', {
-        state: { message: 'Account created successfully! Please login.' },
-      });
+      navigate('/', { replace: true });
     } catch (err) {
       console.error('Registration failed:', err);
     }
@@ -198,11 +196,10 @@ const Signup = () => {
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                      step >= 1
-                        ? 'bg-white text-primary-500'
-                        : 'bg-white/20 text-white'
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 1
+                      ? 'bg-white text-primary-500'
+                      : 'bg-white/20 text-white'
+                      }`}
                   >
                     {step > 1 ? <HiCheckCircle className="w-6 h-6" /> : '1'}
                   </div>
@@ -216,11 +213,10 @@ const Signup = () => {
 
                 <div className="flex items-start space-x-4">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                      step >= 2
-                        ? 'bg-white text-primary-500'
-                        : 'bg-white/20 text-white'
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 2
+                      ? 'bg-white text-primary-500'
+                      : 'bg-white/20 text-white'
+                      }`}
                   >
                     2
                   </div>
@@ -285,11 +281,10 @@ const Signup = () => {
                           name="name"
                           value={formData.name}
                           onChange={handleChange}
-                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                            validationErrors.name
-                              ? 'border-red-300 focus:border-red-500'
-                              : 'border-gray-200 focus:border-primary-500'
-                          }`}
+                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${validationErrors.name
+                            ? 'border-red-300 focus:border-red-500'
+                            : 'border-gray-200 focus:border-primary-500'
+                            }`}
                           placeholder="Enter your full name"
                         />
                       </div>
@@ -310,11 +305,10 @@ const Signup = () => {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                            validationErrors.email
-                              ? 'border-red-300 focus:border-red-500'
-                              : 'border-gray-200 focus:border-primary-500'
-                          }`}
+                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${validationErrors.email
+                            ? 'border-red-300 focus:border-red-500'
+                            : 'border-gray-200 focus:border-primary-500'
+                            }`}
                           placeholder="your@email.com"
                         />
                       </div>
@@ -335,11 +329,10 @@ const Signup = () => {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                            validationErrors.phone
-                              ? 'border-red-300 focus:border-red-500'
-                              : 'border-gray-200 focus:border-primary-500'
-                          }`}
+                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${validationErrors.phone
+                            ? 'border-red-300 focus:border-red-500'
+                            : 'border-gray-200 focus:border-primary-500'
+                            }`}
                           placeholder="01XXXXXXXXX"
                         />
                       </div>
@@ -360,11 +353,10 @@ const Signup = () => {
                           name="password"
                           value={formData.password}
                           onChange={handleChange}
-                          className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                            validationErrors.password
-                              ? 'border-red-300 focus:border-red-500'
-                              : 'border-gray-200 focus:border-primary-500'
-                          }`}
+                          className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${validationErrors.password
+                            ? 'border-red-300 focus:border-red-500'
+                            : 'border-gray-200 focus:border-primary-500'
+                            }`}
                           placeholder="Create a strong password"
                         />
                         <button
@@ -399,11 +391,10 @@ const Signup = () => {
                           name="confirmPassword"
                           value={formData.confirmPassword}
                           onChange={handleChange}
-                          className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                            validationErrors.confirmPassword
-                              ? 'border-red-300 focus:border-red-500'
-                              : 'border-gray-200 focus:border-primary-500'
-                          }`}
+                          className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none transition-colors ${validationErrors.confirmPassword
+                            ? 'border-red-300 focus:border-red-500'
+                            : 'border-gray-200 focus:border-primary-500'
+                            }`}
                           placeholder="Re-enter your password"
                         />
                         <button
@@ -456,11 +447,10 @@ const Signup = () => {
                           name="hall"
                           value={formData.hall}
                           onChange={handleChange}
-                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                            validationErrors.hall
-                              ? 'border-red-300 focus:border-red-500'
-                              : 'border-gray-200 focus:border-primary-500'
-                          }`}
+                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${validationErrors.hall
+                            ? 'border-red-300 focus:border-red-500'
+                            : 'border-gray-200 focus:border-primary-500'
+                            }`}
                         >
                           <option value="">Select your hall</option>
                           {halls.map((hall) => (
