@@ -118,8 +118,7 @@ const PromoCodes = () => {
     try {
       if (editingPromo) {
         await axios.put(
-          `${import.meta.env.VITE_API_URL}/admin/promo-codes/${
-            editingPromo._id
+          `${import.meta.env.VITE_API_URL}/admin/promo-codes/${editingPromo._id
           }`,
           formData,
           {
@@ -196,7 +195,7 @@ const PromoCodes = () => {
   const togglePromoStatus = async (promoId, currentStatus) => {
     try {
       await axios.patch(
-        `${import.meta.env.VITE_API_URL}/admin/promo-codes/${promoId}/toggle`,
+        `${import.meta.env.VITE_API_URL}/admin/promo-codes/${promoId}/status`,
         { isActive: !currentStatus },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -312,61 +311,56 @@ const PromoCodes = () => {
             key={promo._id}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden border-2 ${
-              isExpired(promo.validUntil)
+            className={`bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden border-2 ${isExpired(promo.validUntil)
                 ? "border-red-200 opacity-60"
                 : promo.isActive
-                ? "border-green-200"
-                : "border-gray-200"
-            }`}
+                  ? "border-green-200"
+                  : "border-gray-200"
+              }`}
           >
             {/* Card Header */}
             <div
-              className={`p-4 ${
-                isExpired(promo.validUntil)
+              className={`p-4 ${isExpired(promo.validUntil)
                   ? "bg-red-50"
                   : promo.isActive
-                  ? "bg-gradient-to-r from-primary-500 to-primary-600"
-                  : "bg-gray-100"
-              }`}
+                    ? "bg-gradient-to-r from-primary-500 to-primary-600"
+                    : "bg-gray-100"
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <HiTicket
-                    className={`w-6 h-6 ${
-                      isExpired(promo.validUntil)
+                    className={`w-6 h-6 ${isExpired(promo.validUntil)
                         ? "text-red-500"
                         : promo.isActive
-                        ? "text-white"
-                        : "text-gray-500"
-                    }`}
+                          ? "text-white"
+                          : "text-gray-500"
+                      }`}
                   />
                   <h3
-                    className={`text-xl font-bold tracking-wide ${
-                      isExpired(promo.validUntil)
+                    className={`text-xl font-bold tracking-wide ${isExpired(promo.validUntil)
                         ? "text-red-700"
                         : promo.isActive
-                        ? "text-white"
-                        : "text-gray-700"
-                    }`}
+                          ? "text-white"
+                          : "text-gray-700"
+                      }`}
                   >
                     {promo.code}
                   </h3>
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    isExpired(promo.validUntil)
+                  className={`px-3 py-1 rounded-full text-xs font-bold ${isExpired(promo.validUntil)
                       ? "bg-red-200 text-red-700"
                       : promo.isActive
-                      ? "bg-white/20 text-white"
-                      : "bg-gray-300 text-gray-700"
-                  }`}
+                        ? "bg-white/20 text-white"
+                        : "bg-gray-300 text-gray-700"
+                    }`}
                 >
                   {isExpired(promo.validUntil)
                     ? "Expired"
                     : promo.isActive
-                    ? "Active"
-                    : "Inactive"}
+                      ? "Active"
+                      : "Inactive"}
                 </span>
               </div>
             </div>
@@ -468,11 +462,10 @@ const PromoCodes = () => {
                 </button>
                 <button
                   onClick={() => togglePromoStatus(promo._id, promo.isActive)}
-                  className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors text-sm ${
-                    promo.isActive
+                  className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors text-sm ${promo.isActive
                       ? "bg-yellow-50 text-yellow-600 hover:bg-yellow-100"
                       : "bg-green-50 text-green-600 hover:bg-green-100"
-                  }`}
+                    }`}
                 >
                   {promo.isActive ? "Deactivate" : "Activate"}
                 </button>
@@ -793,15 +786,13 @@ const PromoCodes = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.6 }}
-              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${
-                t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
-              }`}
+              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
+                }`}
             >
               <div className="relative">
                 <div
-                  className={`absolute left-0 top-0 h-full w-1 ${
-                    t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
-                  }`}
+                  className={`absolute left-0 top-0 h-full w-1 ${t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
+                    }`}
                 />
                 <div className="p-3 pl-4 pr-10 flex items-start gap-3">
                   <div className="mt-0.5 shrink-0">
