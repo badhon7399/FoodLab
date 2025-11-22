@@ -219,8 +219,8 @@ const Orders = () => {
               key={status}
               onClick={() => setFilterStatus(status)}
               className={`px-6 py-2 rounded-xl font-semibold transition-all ${filterStatus === status
-                  ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
-                  : "text-gray-600 hover:bg-gray-100"
+                ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
+                : "text-gray-600 hover:bg-gray-100"
                 }`}
             >
               {status}
@@ -259,7 +259,19 @@ const Orders = () => {
         ) : (
           <div className="grid grid-cols-1 gap-6">
             {filteredOrders.map((order, index) => {
-              const statusConfig = statusColors[order.status];
+              const getStatusConfig = (status) => {
+                const normalizedStatus = status.toLowerCase();
+                const configMap = {
+                  pending: statusColors.Pending,
+                  preparing: statusColors.Preparing,
+                  "out for delivery": statusColors["Out for Delivery"],
+                  delivered: statusColors.Delivered,
+                  cancelled: statusColors.Cancelled,
+                };
+                return configMap[normalizedStatus] || statusColors.Pending;
+              };
+
+              const statusConfig = getStatusConfig(order.status);
               const StatusIcon = statusConfig.icon;
 
               return (
@@ -413,13 +425,13 @@ const Orders = () => {
                                 >
                                   <div
                                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${[
-                                        "Pending",
-                                        "Preparing",
-                                        "Out for Delivery",
-                                        "Delivered",
-                                      ].indexOf(order.status) >= idx
-                                        ? "bg-primary-500 text-white"
-                                        : "bg-gray-200 text-gray-500"
+                                      "Pending",
+                                      "Preparing",
+                                      "Out for Delivery",
+                                      "Delivered",
+                                    ].indexOf(order.status) >= idx
+                                      ? "bg-primary-500 text-white"
+                                      : "bg-gray-200 text-gray-500"
                                       }`}
                                   >
                                     {idx + 1}
@@ -611,8 +623,8 @@ const Orders = () => {
                         <span className="text-gray-600">Payment Status</span>
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedOrder.paymentStatus === "Completed"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-yellow-100 text-yellow-700"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
                             }`}
                         >
                           {selectedOrder.paymentStatus}
@@ -679,8 +691,8 @@ const Orders = () => {
                         >
                           <HiStar
                             className={`w-10 h-10 ${star <= reviewData.rating
-                                ? "text-yellow-400 fill-current"
-                                : "text-gray-300"
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-300"
                               }`}
                           />
                         </button>
