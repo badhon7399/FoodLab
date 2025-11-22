@@ -14,6 +14,7 @@ import {
   HiInformationCircle,
   HiExclamation,
   HiUser,
+  HiXCircle,
 } from "react-icons/hi";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -101,6 +102,11 @@ const Orders = () => {
       cancelled: statusColors.Cancelled,
     };
     return configMap[normalizedStatus] || statusColors.Pending;
+  };
+
+  // Helper to safely format price
+  const formatPrice = (price) => {
+    return (Number(price) || 0).toFixed(2);
   };
 
   useEffect(() => {
@@ -206,8 +212,6 @@ const Orders = () => {
       pushToast("Review submitted successfully", "success");
       setShowReviewModal(false);
       setReviewData({ rating: 5, comment: "" });
-      // Optimistically update the order to show reviewed state if needed
-      // For now, just close modal
     } catch (error) {
       pushToast("Failed to submit review", "error");
     }
@@ -429,7 +433,7 @@ const Orders = () => {
                           <span>{order.paymentMethod}</span>
                         </div>
                         <div className="font-bold text-lg text-gray-900">
-                          ৳{order.totalAmount}
+                          ৳{formatPrice(order.totalAmount)}
                         </div>
                       </div>
 
@@ -539,11 +543,11 @@ const Orders = () => {
                               {item.name}
                             </h4>
                             <p className="text-sm text-gray-500">
-                              ৳{item.price} × {item.quantity}
+                              ৳{formatPrice(item.price)} × {item.quantity}
                             </p>
                           </div>
                           <div className="font-bold text-gray-900">
-                            ৳{item.price * item.quantity}
+                            ৳{formatPrice(item.price * item.quantity)}
                           </div>
                         </div>
                       ))}
@@ -599,17 +603,17 @@ const Orders = () => {
                       <div className="flex justify-between text-gray-600">
                         <span>Subtotal</span>
                         <span>
-                          ৳{selectedOrder.subtotal || selectedOrder.totalAmount}
+                          ৳{formatPrice(selectedOrder.subtotal || selectedOrder.totalAmount)}
                         </span>
                       </div>
                       <div className="flex justify-between text-gray-600">
                         <span>Delivery Fee</span>
-                        <span>৳{selectedOrder.deliveryFee || 0}</span>
+                        <span>৳{formatPrice(selectedOrder.deliveryFee)}</span>
                       </div>
                       <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
                         <span className="font-bold text-gray-900">Total</span>
                         <span className="text-2xl font-extrabold text-primary-600">
-                          ৳{selectedOrder.totalAmount}
+                          ৳{formatPrice(selectedOrder.totalAmount)}
                         </span>
                       </div>
                     </div>
