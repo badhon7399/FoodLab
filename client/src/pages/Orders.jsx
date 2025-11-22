@@ -377,7 +377,7 @@ const Orders = () => {
                         <div className="flex items-center space-x-2 text-gray-600">
                           <HiLocationMarker className="w-5 h-5" />
                           <span className="text-sm">
-                            {order.deliveryDetails.hall}
+                            {order.deliveryDetails?.hall || "N/A"}
                           </span>
                         </div>
                       </div>
@@ -533,7 +533,7 @@ const Orders = () => {
                         <div>
                           <p className="text-sm text-gray-600">Name</p>
                           <p className="font-semibold text-gray-900">
-                            {selectedOrder.deliveryDetails.name}
+                            {selectedOrder.deliveryDetails?.name || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -542,7 +542,7 @@ const Orders = () => {
                         <div>
                           <p className="text-sm text-gray-600">Phone</p>
                           <p className="font-semibold text-gray-900">
-                            {selectedOrder.deliveryDetails.phone}
+                            {selectedOrder.deliveryDetails?.phone || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -551,13 +551,13 @@ const Orders = () => {
                         <div>
                           <p className="text-sm text-gray-600">Address</p>
                           <p className="font-semibold text-gray-900">
-                            {selectedOrder.deliveryDetails.hall}
-                            {selectedOrder.deliveryDetails.roomNumber &&
+                            {selectedOrder.deliveryDetails?.hall || "N/A"}
+                            {selectedOrder.deliveryDetails?.roomNumber &&
                               `, Room ${selectedOrder.deliveryDetails.roomNumber}`}
                           </p>
                         </div>
                       </div>
-                      {selectedOrder.deliveryDetails.instructions && (
+                      {selectedOrder.deliveryDetails?.instructions && (
                         <div className="flex items-start space-x-3">
                           <HiInformationCircle className="w-5 h-5 text-gray-500 mt-0.5" />
                           <div>
