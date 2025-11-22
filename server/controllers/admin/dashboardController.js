@@ -40,10 +40,20 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
     status: { $in: ['Pending', 'Preparing'] },
   });
 
+  // Low stock items (less than 10)
+  const lowStockItems = await Food.countDocuments({
+    stock: { $ne: null, $lt: 10 },
+  });
+
+  // Unavailable items
+  const unavailableItems = await Food.countDocuments({
+    isAvailable: false,
+  });
+
   // Today's stats
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const todayOrders = await Order.countDocuments({
     createdAt: { $gte: today },
   });
@@ -110,6 +120,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
       todayRevenue: todayRevenue[0]?.total || 0,
       averageOrderValue:
         periodOrders > 0 ? (periodRevenue[0]?.total || 0) / periodOrders : 0,
+      lowStockItems,
+      unavailableItems,
     },
     recentOrders,
     topProducts,

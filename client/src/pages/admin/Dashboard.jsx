@@ -18,6 +18,8 @@ import {
   HiCalendar,
   HiFilter,
   HiCreditCard,
+  HiExclamation,
+  HiXCircle,
 } from "react-icons/hi";
 import {
   LineChart,
@@ -283,9 +285,8 @@ const Dashboard = () => {
                   </h3>
                   <div className="flex items-center space-x-2">
                     <span
-                      className={`inline-flex items-center text-sm font-semibold ${
-                        stat.isPositive ? "text-green-600" : "text-red-600"
-                      }`}
+                      className={`inline-flex items-center text-sm font-semibold ${stat.isPositive ? "text-green-600" : "text-red-600"
+                        }`}
                     >
                       {stat.isPositive ? (
                         <HiTrendingUp className="w-4 h-4 mr-1" />
@@ -697,9 +698,8 @@ const Dashboard = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                          statusColors[order.status]
-                        }`}
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${statusColors[order.status]
+                          }`}
                       >
                         {order.status}
                       </span>
@@ -792,17 +792,16 @@ const Dashboard = () => {
                     <div
                       className="h-full bg-yellow-400"
                       style={{
-                        width: `${
-                          rating === 5
-                            ? 85
-                            : rating === 4
+                        width: `${rating === 5
+                          ? 85
+                          : rating === 4
                             ? 60
                             : rating === 3
-                            ? 30
-                            : rating === 2
-                            ? 10
-                            : 5
-                        }%`,
+                              ? 30
+                              : rating === 2
+                                ? 10
+                                : 5
+                          }%`,
                       }}
                     />
                   </div>
@@ -810,12 +809,12 @@ const Dashboard = () => {
                     {rating === 5
                       ? "85%"
                       : rating === 4
-                      ? "60%"
-                      : rating === 3
-                      ? "30%"
-                      : rating === 2
-                      ? "10%"
-                      : "5%"}
+                        ? "60%"
+                        : rating === 3
+                          ? "30%"
+                          : rating === 2
+                            ? "10%"
+                            : "5%"}
                   </span>
                 </div>
               ))}
@@ -910,35 +909,85 @@ const Dashboard = () => {
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">System Alerts</h2>
         <div className="space-y-3">
-          <div className="flex items-start space-x-3 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-xl">
-            <HiClock className="w-5 h-5 text-yellow-600 mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-yellow-900">
-                {stats.pendingOrders} orders pending approval
-              </h4>
-              <p className="text-sm text-yellow-700 mt-1">
-                Please review and approve pending orders
-              </p>
+          {/* Pending Orders Alert */}
+          {stats.pendingOrders > 0 && (
+            <div className="flex items-start space-x-3 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-xl">
+              <HiClock className="w-5 h-5 text-yellow-600 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-yellow-900">
+                  {stats.pendingOrders} orders pending approval
+                </h4>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Please review and approve pending orders
+                </p>
+              </div>
+              <Link
+                to="/admin/orders?status=Pending"
+                className="ml-auto px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors whitespace-nowrap"
+              >
+                Review Now
+              </Link>
             </div>
-            <Link
-              to="/admin/orders?status=Pending"
-              className="ml-auto px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors whitespace-nowrap"
-            >
-              Review Now
-            </Link>
-          </div>
+          )}
 
-          <div className="flex items-start space-x-3 p-4 bg-green-50 border-l-4 border-green-400 rounded-r-xl">
-            <HiCheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-green-900">
-                All systems operational
-              </h4>
-              <p className="text-sm text-green-700 mt-1">
-                Payment gateway and delivery tracking active
-              </p>
+          {/* Low Stock Alert */}
+          {stats.lowStockItems > 0 && (
+            <div className="flex items-start space-x-3 p-4 bg-orange-50 border-l-4 border-orange-400 rounded-r-xl">
+              <HiExclamation className="w-5 h-5 text-orange-600 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-orange-900">
+                  {stats.lowStockItems} items low in stock
+                </h4>
+                <p className="text-sm text-orange-700 mt-1">
+                  Some menu items are running low on stock
+                </p>
+              </div>
+              <Link
+                to="/admin/menu"
+                className="ml-auto px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors whitespace-nowrap"
+              >
+                Check Stock
+              </Link>
             </div>
-          </div>
+          )}
+
+          {/* Unavailable Items Alert */}
+          {stats.unavailableItems > 0 && (
+            <div className="flex items-start space-x-3 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-xl">
+              <HiXCircle className="w-5 h-5 text-red-600 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-red-900">
+                  {stats.unavailableItems} items unavailable
+                </h4>
+                <p className="text-sm text-red-700 mt-1">
+                  These items are currently hidden from customers
+                </p>
+              </div>
+              <Link
+                to="/admin/menu"
+                className="ml-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors whitespace-nowrap"
+              >
+                Manage
+              </Link>
+            </div>
+          )}
+
+          {/* All Systems Operational */}
+          {stats.pendingOrders === 0 &&
+            !stats.lowStockItems &&
+            !stats.unavailableItems && (
+              <div className="flex items-start space-x-3 p-4 bg-green-50 border-l-4 border-green-400 rounded-r-xl">
+                <HiCheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-green-900">
+                    All systems operational
+                  </h4>
+                  <p className="text-sm text-green-700 mt-1">
+                    No pending actions required at this time
+                  </p>
+                </div>
+              </div>
+            )}
         </div>
       </div>
     </div>
