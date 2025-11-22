@@ -276,16 +276,16 @@ const Orders = () => {
                 key={status}
                 onClick={() => setFilterStatus(status)}
                 className={`px-6 py-2.5 rounded-full font-semibold transition-all duration-300 text-sm ${filterStatus === status
-                    ? "bg-gray-900 text-white shadow-lg transform scale-105"
-                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                  ? "bg-gray-900 text-white shadow-lg transform scale-105"
+                  : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
                   }`}
               >
                 {status}
                 {status !== "All" && (
                   <span
                     className={`ml-2 px-2 py-0.5 rounded-full text-xs ${filterStatus === status
-                        ? "bg-white/20 text-white"
-                        : "bg-gray-100 text-gray-600"
+                      ? "bg-white/20 text-white"
+                      : "bg-gray-100 text-gray-600"
                       }`}
                   >
                     {orders.filter((o) => o.status === status).length}
@@ -603,17 +603,29 @@ const Orders = () => {
                       <div className="flex justify-between text-gray-600">
                         <span>Subtotal</span>
                         <span>
-                          ৳{formatPrice(selectedOrder.subtotal || selectedOrder.totalAmount)}
+                          ৳
+                          {formatPrice(
+                            selectedOrder.items.reduce(
+                              (sum, item) => sum + item.price * item.quantity,
+                              0
+                            )
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between text-gray-600">
                         <span>Delivery Fee</span>
-                        <span>৳{formatPrice(selectedOrder.deliveryFee)}</span>
+                        <span>৳{formatPrice(selectedOrder.deliveryFee || 0)}</span>
                       </div>
                       <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
                         <span className="font-bold text-gray-900">Total</span>
                         <span className="text-2xl font-extrabold text-primary-600">
-                          ৳{formatPrice(selectedOrder.totalAmount)}
+                          ৳
+                          {formatPrice(
+                            selectedOrder.items.reduce(
+                              (sum, item) => sum + item.price * item.quantity,
+                              0
+                            ) + (selectedOrder.deliveryFee || 0)
+                          )}
                         </span>
                       </div>
                     </div>
@@ -658,8 +670,8 @@ const Orders = () => {
                       >
                         <HiStar
                           className={`w-10 h-10 ${star <= reviewData.rating
-                              ? "text-yellow-400"
-                              : "text-gray-200"
+                            ? "text-yellow-400"
+                            : "text-gray-200"
                             }`}
                         />
                       </button>
@@ -749,10 +761,10 @@ const Orders = () => {
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 20, scale: 0.9 }}
                 className={`pointer-events-auto p-4 rounded-2xl shadow-xl flex items-center gap-3 border ${t.type === "success"
-                    ? "bg-white border-green-100 text-green-800"
-                    : t.type === "error"
-                      ? "bg-white border-red-100 text-red-800"
-                      : "bg-white border-blue-100 text-blue-800"
+                  ? "bg-white border-green-100 text-green-800"
+                  : t.type === "error"
+                    ? "bg-white border-red-100 text-red-800"
+                    : "bg-white border-blue-100 text-blue-800"
                   }`}
               >
                 {t.type === "success" && (
