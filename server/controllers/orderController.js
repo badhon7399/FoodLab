@@ -73,10 +73,11 @@ export const listMyOrders = asyncWrap(async (req, res) => {
         })),
         total: o.totalAmount ?? o.total ?? 0,
         deliveryFee: o.deliveryFee ?? 0,
+        deliveryDetails: o.deliveryDetails,
+        notes: o.notes,
         hall: o.deliveryDetails?.hall,
         room: o.deliveryDetails?.roomNumber,
         phone: o.deliveryDetails?.phone,
-        notes: o.deliveryDetails?.instructions,
         deliverySlot: o.estimatedDeliveryTime ? new Date(o.estimatedDeliveryTime).toLocaleString() : undefined,
     }))
     res.json(mapped)
