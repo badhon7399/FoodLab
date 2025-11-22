@@ -9,6 +9,9 @@ import {
   HiX,
   HiClock,
   HiTruck,
+  HiCheckCircle,
+  HiXCircle,
+  HiExclamation,
 } from "react-icons/hi";
 import axios from "axios";
 
@@ -19,6 +22,15 @@ const OrderManagement = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [toasts, setToasts] = useState([]);
+
+  const pushToast = (message, type = "info", duration = 3000) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, duration);
+  };
 
   const statusColors = {
     Pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
@@ -92,8 +104,10 @@ const OrderManagement = () => {
       );
       fetchOrders();
       setShowOrderModal(false);
+      pushToast(`Order status updated to ${newStatus}`, "success");
     } catch (error) {
       console.error("Error updating order:", error);
+      pushToast("Failed to update order status", "error");
     }
   };
 
@@ -151,8 +165,8 @@ const OrderManagement = () => {
                 key={status}
                 onClick={() => setStatusFilter(status)}
                 className={`p-4 rounded-xl border-2 transition-all ${statusFilter === status
-                    ? "border-primary-500 bg-primary-50"
-                    : "border-gray-200 hover:border-gray-300"
+                  ? "border-primary-500 bg-primary-50"
+                  : "border-gray-200 hover:border-gray-300"
                   }`}
               >
                 <p className="text-2xl font-bold text-gray-900">
@@ -237,8 +251,8 @@ const OrderManagement = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${order.paymentStatus === "Completed"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
                           }`}
                       >
                         {order.paymentStatus}
@@ -424,8 +438,8 @@ const OrderManagement = () => {
                       <span className="text-gray-600">Payment Status</span>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedOrder.paymentStatus === "Completed"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
                           }`}
                       >
                         {selectedOrder.paymentStatus}
@@ -453,8 +467,8 @@ const OrderManagement = () => {
                           updateOrderStatus(selectedOrder._id, status)
                         }
                         className={`p-3 rounded-xl border-2 font-semibold transition-all ${selectedOrder.status === status
-                            ? "border-primary-500 bg-primary-50 text-primary-600"
-                            : "border-gray-200 hover:border-gray-300 text-gray-700"
+                          ? "border-primary-500 bg-primary-50 text-primary-600"
+                          : "border-gray-200 hover:border-gray-300 text-gray-700"
                           }`}
                       >
                         {status}
@@ -467,6 +481,37 @@ const OrderManagement = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Toasts */}
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+        <AnimatePresence>
+          {toasts.map((t) => (
+            <motion.div
+              key={t.id}
+              initial={{ opacity: 0, x: 50, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 20, scale: 0.9 }}
+              className={`pointer-events-auto p-4 rounded-2xl shadow-xl flex items-center gap-3 border ${t.type === "success"
+                  ? "bg-white border-green-100 text-green-800"
+                  : t.type === "error"
+                    ? "bg-white border-red-100 text-red-800"
+                    : "bg-white border-blue-100 text-blue-800"
+                }`}
+            >
+              {t.type === "success" && (
+                <HiCheckCircle className="w-6 h-6 text-green-500" />
+              )}
+              {t.type === "error" && (
+                <HiXCircle className="w-6 h-6 text-red-500" />
+              )}
+              {t.type === "info" && (
+                <HiExclamation className="w-6 h-6 text-blue-500" />
+              )}
+              <p className="font-medium text-sm">{t.message}</p>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
