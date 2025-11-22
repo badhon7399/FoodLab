@@ -1,34 +1,114 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+import axios from "axios";
 import {
   HiShoppingBag,
   HiClock,
   HiCheckCircle,
-  HiXCircle,
+  HiX,
   HiTruck,
   HiEye,
-  HiDownload,
-  HiFilter,
   HiStar,
+  HiLocationMarker,
+  HiPhone,
+  HiCreditCard,
+  HiInformationCircle,
   HiExclamation,
-  HiX,
-} from 'react-icons/hi';
-import { initializeSocket } from '../../utils/socket';
+  HiUser,
+  HiXCircle,
+} from "react-icons/hi";
+import { initializeSocket } from "../../utils/socket";
 
 const OrderHistory = () => {
   const { token } = useSelector((state) => state.auth);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('all');
-
-  // New state for features
+  const [showOrderModal, setShowOrderModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
-  const [confirmState, setConfirmState] = useState({ open: false, id: null, message: '' });
+  const [reviewData, setReviewData] = useState({
+    rating: 5,
+    comment: "",
+  });
+
+  // Toasts
   const [toasts, setToasts] = useState([]);
+  const pushToast = (message, type = "info", duration = 3500) => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    if (duration > 0)
+      setTimeout(() => setToasts((p) => p.filter((t) => t.id !== id)), duration);
+  };
+
+  // Confirm modal
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    id: null,
+    message: "",
+  });
+  const openConfirm = (id, message) =>
+    setConfirmState({ open: true, id, message });
+  const closeConfirm = () =>
+    setConfirmState({ open: false, id: null, message: "" });
+
+  const statusColors = {
+    Pending: {
+      bg: "bg-yellow-500/10",
+      text: "text-yellow-600",
+      border: "border-yellow-200",
+      icon: HiClock,
+      gradient: "from-yellow-400 to-orange-500",
+    },
+    Preparing: {
+      bg: "bg-blue-500/10",
+      text: "text-blue-600",
+      border: "border-blue-200",
+      icon: HiClock,
+      gradient: "from-blue-400 to-indigo-500",
+    },
+    "Out for Delivery": {
+      bg: "bg-purple-500/10",
+      text: "text-purple-600",
+      border: "border-purple-200",
+      icon: HiTruck,
+      gradient: "from-purple-400 to-pink-500",
+    },
+    Delivered: {
+      bg: "bg-green-500/10",
+      text: "text-green-600",
+      border: "border-green-200",
+      icon: HiCheckCircle,
+      gradient: "from-green-400 to-emerald-500",
+    },
+    Cancelled: {
+      bg: "bg-red-500/10",
+      text: "text-red-600",
+      border: "border-red-200",
+      icon: HiX,
+      gradient: "from-red-400 to-rose-500",
+    },
+  };
+
+  // Robust status config getter
+  const getStatusConfig = (status) => {
+    if (!status) return statusColors.Pending;
+    const normalizedStatus = status.toLowerCase();
+    const configMap = {
+      pending: statusColors.Pending,
+      preparing: statusColors.Preparing,
+      "out for delivery": statusColors["Out for Delivery"],
+      delivered: statusColors.Delivered,
+      cancelled: statusColors.Cancelled,
+    };
+    return configMap[normalizedStatus] || statusColors.Pending;
+  };
+
+  // Helper to safely format price
+  const formatPrice = (price) => {
+    return (Number(price) || 0).toFixed(2);
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -37,6 +117,7 @@ const OrderHistory = () => {
 
   const setupSocketListeners = () => {
     if (!token) return;
+
     const socket = initializeSocket(token);
     if (!socket) return;
 
@@ -48,17 +129,13 @@ const OrderHistory = () => {
             : order
         )
       );
+
       pushToast(`Order status updated: ${data.status}`, "info");
     });
   };
 
-  const pushToast = (message, type = "info", duration = 3500) => {
-    const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    if (duration > 0) setTimeout(() => setToasts((p) => p.filter((t) => t.id !== id)), duration);
-  };
-
   const fetchOrders = async () => {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_URL}/orders/my-orders`,
@@ -66,33 +143,48 @@ const OrderHistory = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // Handle both array and object response formats
+      // Robust data handling
       setOrders(Array.isArray(data) ? data : data.orders || []);
-    } catch (err) {
-      console.error('Error fetching orders:', err);
-      pushToast('Failed to fetch orders', 'error');
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      pushToast("Failed to load orders", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelOrder = (orderId) => {
-    setConfirmState({ open: true, id: orderId, message: "Are you sure you want to cancel this order?" });
+  const filteredOrders =
+    filterStatus === "All"
+      ? orders
+      : orders.filter((order) => order.status === filterStatus);
+
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setShowOrderModal(true);
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    openConfirm(orderId, "Are you sure you want to cancel this order?");
   };
 
   const confirmCancel = async () => {
+    const orderId = confirmState.id;
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/orders/${confirmState.id}/cancel`,
+        `${import.meta.env.VITE_API_URL}/orders/${orderId}/cancel`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       fetchOrders();
       pushToast("Order cancelled successfully", "success");
     } catch (error) {
       pushToast("Failed to cancel order", "error");
     } finally {
-      setConfirmState({ open: false, id: null, message: '' });
+      closeConfirm();
     }
   };
 
@@ -105,41 +197,43 @@ const OrderHistory = () => {
           rating: reviewData.rating,
           comment: reviewData.comment,
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
+
       pushToast("Review submitted successfully", "success");
       setShowReviewModal(false);
       setReviewData({ rating: 5, comment: "" });
-      // Optionally refresh orders to update review status if needed
     } catch (error) {
       pushToast("Failed to submit review", "error");
     }
   };
 
-  const getStatusConfig = (status) => {
-    const configs = {
-      Pending: { icon: HiClock, color: 'yellow', bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' },
-      pending: { icon: HiClock, color: 'yellow', bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' },
-      Preparing: { icon: HiClock, color: 'blue', bg: 'bg-blue-100', text: 'text-blue-700', label: 'Preparing' },
-      processing: { icon: HiTruck, color: 'blue', bg: 'bg-blue-100', text: 'text-blue-700', label: 'Processing' },
-      "Out for Delivery": { icon: HiTruck, color: 'purple', bg: 'bg-purple-100', text: 'text-purple-700', label: 'Out for Delivery' },
-      Completed: { icon: HiCheckCircle, color: 'green', bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' },
-      completed: { icon: HiCheckCircle, color: 'green', bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' },
-      Delivered: { icon: HiCheckCircle, color: 'green', bg: 'bg-green-100', text: 'text-green-700', label: 'Delivered' },
-      Cancelled: { icon: HiXCircle, color: 'red', bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' },
-      cancelled: { icon: HiXCircle, color: 'red', bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' },
-    };
-    return configs[status] || configs.Pending;
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
   };
 
-  const filteredOrders = statusFilter === 'all'
-    ? orders
-    : orders.filter((order) => order.status.toLowerCase() === statusFilter.toLowerCase());
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { type: "spring", stiffness: 100 },
+    },
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500" />
+        <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -148,118 +242,525 @@ const OrderHistory = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-8"
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Order History</h2>
           <p className="text-gray-600 mt-1">
-            You have {orders.length} order{orders.length !== 1 ? 's' : ''}
+            You have {orders.length} order{orders.length !== 1 ? "s" : ""}
           </p>
         </div>
 
-        {/* Filter */}
-        <div className="flex items-center gap-2">
-          <HiFilter className="w-5 h-5 text-gray-500" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none"
-          >
-            <option value="all">All Orders</option>
-            <option value="Pending">Pending</option>
-            <option value="Preparing">Preparing</option>
-            <option value="Out for Delivery">Out for Delivery</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+        {/* Filter Tabs */}
+        <div className="overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex space-x-2 min-w-max">
+            {[
+              "All",
+              "Pending",
+              "Preparing",
+              "Out for Delivery",
+              "Delivered",
+              "Cancelled",
+            ].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 text-sm ${filterStatus === status
+                    ? "bg-gray-900 text-white shadow-md"
+                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                  }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Orders List */}
+      {/* Orders Grid */}
       {filteredOrders.length === 0 ? (
-        <div className="text-center py-16">
-          <HiShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center justify-center py-16 bg-white rounded-3xl shadow-sm border border-gray-100"
+        >
+          <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+            <HiShoppingBag className="w-12 h-12 text-gray-300" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-800 mb-1">
             No orders found
           </h3>
-          <p className="text-gray-500">
-            {statusFilter === 'all'
-              ? "You haven't placed any orders yet"
-              : `No ${statusFilter} orders`}
+          <p className="text-gray-500 text-center max-w-xs">
+            {filterStatus === "All"
+              ? "You haven't placed any orders yet."
+              : `No ${filterStatus} orders found.`}
           </p>
-        </div>
+        </motion.div>
       ) : (
-        <div className="space-y-4">
-          {filteredOrders.map((order) => (
-            <OrderCard
-              key={order._id}
-              order={order}
-              onViewDetails={() => setSelectedOrder(order)}
-              getStatusConfig={getStatusConfig}
-              onCancel={() => handleCancelOrder(order._id)}
-              onReview={() => {
-                setSelectedOrder(order);
-                setShowReviewModal(true);
-              }}
-            />
-          ))}
-        </div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 gap-6"
+        >
+          {filteredOrders.map((order) => {
+            const statusConfig = getStatusConfig(order.status);
+            const StatusIcon = statusConfig.icon;
+
+            return (
+              <motion.div
+                key={order._id}
+                variants={itemVariants}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="bg-white rounded-3xl shadow-sm hover:shadow-xl border border-gray-100 overflow-hidden transition-shadow duration-300"
+              >
+                <div className="p-6">
+                  {/* Card Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${statusConfig.gradient} text-white shadow-md`}
+                      >
+                        <StatusIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900">
+                          Order #{order._id.slice(-8).toUpperCase()}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          {new Date(order.createdAt).toLocaleString(undefined, {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}
+                      >
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Items Preview */}
+                  <div className="bg-gray-50/50 rounded-2xl p-4 mb-6 border border-gray-100">
+                    <div className="flex flex-wrap gap-3 items-center">
+                      {order.items.slice(0, 4).map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="relative group"
+                          title={`${item.quantity}x ${item.name}`}
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-12 h-12 rounded-lg object-cover shadow-sm border border-gray-200 group-hover:scale-105 transition-transform"
+                          />
+                          <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-md">
+                            {item.quantity}
+                          </span>
+                        </div>
+                      ))}
+                      {order.items.length > 4 && (
+                        <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs border border-gray-300">
+                          +{order.items.length - 4}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  {order.status !== "Cancelled" &&
+                    order.status !== "Delivered" && (
+                      <div className="mb-6">
+                        <div className="flex justify-between text-[10px] font-semibold text-gray-400 mb-1 uppercase tracking-wider">
+                          <span>Pending</span>
+                          <span>Preparing</span>
+                          <span>On Way</span>
+                          <span>Delivered</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{
+                              width:
+                                order.status.toLowerCase() === "pending"
+                                  ? "15%"
+                                  : order.status.toLowerCase() === "preparing"
+                                    ? "50%"
+                                    : order.status.toLowerCase() ===
+                                      "out for delivery"
+                                      ? "80%"
+                                      : "100%",
+                            }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                            className={`h-full bg-gradient-to-r ${statusConfig.gradient}`}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Actions Footer */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="font-bold text-lg text-gray-900">
+                        ৳
+                        {formatPrice(
+                          order.totalAmount ||
+                          order.items.reduce(
+                            (sum, item) => sum + item.price * item.quantity,
+                            0
+                          ) + (order.deliveryFee || 0)
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <button
+                        onClick={() => handleViewOrder(order)}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors text-sm"
+                      >
+                        <HiEye className="w-4 h-4" />
+                        Details
+                      </button>
+
+                      {order.status === "Pending" && (
+                        <button
+                          onClick={() => handleCancelOrder(order._id)}
+                          className="flex-1 sm:flex-none px-4 py-2 bg-red-50 text-red-600 rounded-xl font-semibold hover:bg-red-100 transition-colors text-sm"
+                        >
+                          Cancel
+                        </button>
+                      )}
+
+                      {order.status === "Delivered" && !order.rating && (
+                        <button
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setShowReviewModal(true);
+                          }}
+                          className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-700 rounded-xl font-semibold hover:bg-yellow-100 transition-colors text-sm"
+                        >
+                          <HiStar className="w-4 h-4" />
+                          Review
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
       )}
 
       {/* Order Details Modal */}
       <AnimatePresence>
-        {selectedOrder && !showReviewModal && (
-          <OrderDetailsModal
-            order={selectedOrder}
-            onClose={() => setSelectedOrder(null)}
-            getStatusConfig={getStatusConfig}
-          />
+        {showOrderModal && selectedOrder && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            onClick={() => setShowOrderModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide"
+            >
+              <div className="sticky top-0 bg-white/90 backdrop-blur-md p-6 border-b border-gray-100 flex justify-between items-center z-10">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Order Details
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    #{selectedOrder._id.slice(-8).toUpperCase()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowOrderModal(false)}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <HiX className="w-6 h-6 text-gray-600" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-8">
+                {/* Status Section */}
+                <div className="bg-gray-50 rounded-2xl p-6 flex items-center justify-between">
+                  <span className="font-semibold text-gray-600">
+                    Current Status
+                  </span>
+                  <span
+                    className={`px-4 py-1.5 rounded-full text-sm font-bold ${getStatusConfig(selectedOrder.status).bg
+                      } ${getStatusConfig(selectedOrder.status).text}`}
+                  >
+                    {selectedOrder.status}
+                  </span>
+                </div>
+
+                {/* Items */}
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-4">Items</h3>
+                  <div className="space-y-4">
+                    {selectedOrder.items.map((item) => (
+                      <div
+                        key={item._id}
+                        className="flex items-center gap-4 p-4 border border-gray-100 rounded-2xl hover:border-gray-200 transition-colors"
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-20 h-20 rounded-xl object-cover"
+                        />
+                        <div className="flex-1">
+                          <h4 className="font-bold text-gray-900">
+                            {item.name}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            ৳{formatPrice(item.price)} × {item.quantity}
+                          </p>
+                        </div>
+                        <div className="font-bold text-gray-900">
+                          ৳{formatPrice(item.price * item.quantity)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Delivery Info */}
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-4">Delivery</h3>
+                  <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+                    <div className="flex items-start gap-4">
+                      <HiUser className="w-5 h-5 text-gray-400 mt-1" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase font-bold">
+                          Receiver
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {selectedOrder.deliveryDetails?.name || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <HiPhone className="w-5 h-5 text-gray-400 mt-1" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase font-bold">
+                          Phone
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {selectedOrder.deliveryDetails?.phone || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <HiLocationMarker className="w-5 h-5 text-gray-400 mt-1" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase font-bold">
+                          Address
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {selectedOrder.deliveryDetails?.hall || "N/A"}
+                          {selectedOrder.deliveryDetails?.roomNumber &&
+                            `, Room ${selectedOrder.deliveryDetails.roomNumber}`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment Summary */}
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-4">Summary</h3>
+                  <div className="bg-gray-50 rounded-2xl p-6 space-y-3">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Subtotal</span>
+                      <span>
+                        ৳
+                        {formatPrice(
+                          selectedOrder.items.reduce(
+                            (sum, item) => sum + item.price * item.quantity,
+                            0
+                          )
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>Delivery Fee</span>
+                      <span>
+                        ৳{formatPrice(selectedOrder.deliveryFee || 0)}
+                      </span>
+                    </div>
+                    <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
+                      <span className="font-bold text-gray-900">Total</span>
+                      <span className="text-2xl font-extrabold text-primary-600">
+                        ৳
+                        {formatPrice(
+                          selectedOrder.items.reduce(
+                            (sum, item) => sum + item.price * item.quantity,
+                            0
+                          ) + (selectedOrder.deliveryFee || 0)
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* Review Modal */}
       <AnimatePresence>
         {showReviewModal && selectedOrder && (
-          <ReviewModal
-            onClose={() => setShowReviewModal(false)}
-            onSubmit={handleSubmitReview}
-            reviewData={reviewData}
-            setReviewData={setReviewData}
-          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            onClick={() => setShowReviewModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+            >
+              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-8 text-white text-center">
+                <h2 className="text-3xl font-bold mb-2">Rate Order</h2>
+                <p className="opacity-90">How was your food?</p>
+              </div>
+
+              <div className="p-8">
+                <div className="flex justify-center gap-2 mb-8">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() =>
+                        setReviewData({ ...reviewData, rating: star })
+                      }
+                      className="transition-transform hover:scale-110 focus:outline-none"
+                    >
+                      <HiStar
+                        className={`w-10 h-10 ${star <= reviewData.rating
+                            ? "text-yellow-400"
+                            : "text-gray-200"
+                          }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  rows={4}
+                  value={reviewData.comment}
+                  onChange={(e) =>
+                    setReviewData({ ...reviewData, comment: e.target.value })
+                  }
+                  className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-yellow-400 resize-none mb-6"
+                  placeholder="Share your experience..."
+                />
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowReviewModal(false)}
+                    className="flex-1 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmitReview}
+                    className="flex-1 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl font-bold shadow-lg shadow-orange-200 hover:shadow-xl transition-all"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Confirm Modal */}
+      {/* Confirmation Modal */}
       <AnimatePresence>
         {confirmState.open && (
-          <ConfirmModal
-            message={confirmState.message}
-            onConfirm={confirmCancel}
-            onCancel={() => setConfirmState({ open: false, id: null, message: '' })}
-          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={closeConfirm}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center"
+            >
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <HiExclamation className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Cancel Order?
+              </h3>
+              <p className="text-gray-500 mb-6">{confirmState.message}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={closeConfirm}
+                  className="flex-1 py-2.5 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                >
+                  No, Keep it
+                </button>
+                <button
+                  onClick={confirmCancel}
+                  className="flex-1 py-2.5 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200 transition-colors"
+                >
+                  Yes, Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* Toasts */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 w-[min(360px,92vw)] pointer-events-none">
-        <AnimatePresence initial={false}>
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+        <AnimatePresence>
           {toasts.map((t) => (
             <motion.div
               key={t.id}
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.98 }}
-              className={`bg-white rounded-xl shadow-lg ring-1 p-4 pointer-events-auto ${t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : "ring-blue-200"
+              initial={{ opacity: 0, x: 50, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 20, scale: 0.9 }}
+              className={`pointer-events-auto p-4 rounded-2xl shadow-xl flex items-center gap-3 border ${t.type === "success"
+                  ? "bg-white border-green-100 text-green-800"
+                  : t.type === "error"
+                    ? "bg-white border-red-100 text-red-800"
+                    : "bg-white border-blue-100 text-blue-800"
                 }`}
             >
-              <div className="flex items-center gap-3">
-                {t.type === "success" ? <HiCheckCircle className="text-green-500 w-5 h-5" /> :
-                  t.type === "error" ? <HiXCircle className="text-red-500 w-5 h-5" /> :
-                    <HiExclamation className="text-blue-500 w-5 h-5" />}
-                <p className="text-gray-700 font-medium text-sm">{t.message}</p>
-              </div>
+              {t.type === "success" && (
+                <HiCheckCircle className="w-6 h-6 text-green-500" />
+              )}
+              {t.type === "error" && (
+                <HiXCircle className="w-6 h-6 text-red-500" />
+              )}
+              {t.type === "info" && (
+                <HiInformationCircle className="w-6 h-6 text-blue-500" />
+              )}
+              <p className="font-medium text-sm">{t.message}</p>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -267,347 +768,5 @@ const OrderHistory = () => {
     </motion.div>
   );
 };
-
-const OrderCard = ({ order, onViewDetails, getStatusConfig, onCancel, onReview }) => {
-  const statusConfig = getStatusConfig(order.status);
-  const StatusIcon = statusConfig.icon;
-
-  return (
-    <motion.div
-      whileHover={{ scale: 1.01 }}
-      className="bg-white border-2 border-gray-100 rounded-xl p-6 hover:shadow-lg transition-all"
-    >
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-sm font-semibold text-gray-500">
-              Order #{order.orderNumber || order._id.slice(-6)}
-            </span>
-            <span
-              className={`flex items-center gap-1 px-3 py-1 ${statusConfig.bg} ${statusConfig.text} rounded-full text-sm font-semibold`}
-            >
-              <StatusIcon className="w-4 h-4" />
-              {statusConfig.label}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="text-gray-500">Date</p>
-              <p className="font-semibold text-gray-900">
-                {new Date(order.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500">Items</p>
-              <p className="font-semibold text-gray-900">
-                {order.items.length} item{order.items.length !== 1 ? 's' : ''}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500">Total</p>
-              <p className="font-semibold text-gray-900">
-                ৳{order.total.toFixed(2)}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500">Delivery</p>
-              <p className="font-semibold text-gray-900">{order.deliverySlot}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            onClick={onViewDetails}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors font-semibold"
-          >
-            <HiEye className="w-5 h-5" />
-            <span>Details</span>
-          </button>
-
-          {order.status === "Pending" && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onCancel(); }}
-              className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-semibold"
-            >
-              Cancel
-            </button>
-          )}
-
-          {order.status === "Delivered" && !order.rating && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onReview(); }}
-              className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors font-semibold"
-            >
-              <HiStar className="w-5 h-5" />
-              <span>Review</span>
-            </button>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const OrderDetailsModal = ({ order, onClose, getStatusConfig }) => {
-  const statusConfig = getStatusConfig(order.status);
-  const StatusIcon = statusConfig.icon;
-
-  const downloadInvoice = () => {
-    console.log('Downloading invoice for order:', order._id);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-        className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">Order Details</h3>
-            <p className="text-gray-500 mt-1">
-              Order #{order.orderNumber || order._id.slice(-6)}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <HiXCircle className="w-6 h-6 text-gray-500" />
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
-          {/* Status & Date */}
-          <div className="flex items-center justify-between">
-            <span
-              className={`flex items-center gap-2 px-4 py-2 ${statusConfig.bg} ${statusConfig.text} rounded-full font-semibold`}
-            >
-              <StatusIcon className="w-5 h-5" />
-              {statusConfig.label}
-            </span>
-            <span className="text-sm text-gray-500">
-              {new Date(order.createdAt).toLocaleString()}
-            </span>
-          </div>
-
-          {/* Delivery Information */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <h4 className="font-semibold text-gray-900 mb-3">
-              Delivery Information
-            </h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500">Hall</p>
-                <p className="font-semibold text-gray-900">{order.hall}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Room</p>
-                <p className="font-semibold text-gray-900">{order.room}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Delivery Slot</p>
-                <p className="font-semibold text-gray-900">
-                  {order.deliverySlot}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-500">Phone</p>
-                <p className="font-semibold text-gray-900">{order.phone}</p>
-              </div>
-            </div>
-            {order.notes && (
-              <div className="mt-3">
-                <p className="text-gray-500 text-sm">Notes</p>
-                <p className="text-gray-900">{order.notes}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Items */}
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-3">Order Items</h4>
-            <div className="space-y-3">
-              {order.items.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-4 bg-gray-50 rounded-xl p-4"
-                >
-                  <img
-                    src={item.image || '/placeholder-food.jpg'}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                  <div className="flex-1">
-                    <h5 className="font-semibold text-gray-900">{item.name}</h5>
-                    <p className="text-sm text-gray-500">
-                      Quantity: {item.quantity}
-                    </p>
-                  </div>
-                  <p className="font-semibold text-gray-900">
-                    ৳{(item.price * item.quantity).toFixed(2)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Price Breakdown */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <h4 className="font-semibold text-gray-900 mb-3">Price Details</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">
-                  ৳{(order.total - (order.deliveryFee || 0)).toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Delivery Fee</span>
-                <span className="font-semibold">
-                  ৳{(order.deliveryFee || 0).toFixed(2)}
-                </span>
-              </div>
-              <div className="border-t border-gray-200 pt-2 flex justify-between text-lg">
-                <span className="font-bold text-gray-900">Total</span>
-                <span className="font-bold text-primary-600">
-                  ৳{order.total.toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={downloadInvoice}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
-            >
-              <HiDownload className="w-5 h-5" />
-              Download Invoice
-            </button>
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-const ReviewModal = ({ onClose, onSubmit, reviewData, setReviewData }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    onClick={onClose}
-  >
-    <motion.div
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.9, opacity: 0 }}
-      onClick={(e) => e.stopPropagation()}
-      className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
-    >
-      <div className="bg-gradient-to-r from-yellow-500 to-orange-600 p-6 text-white rounded-t-2xl">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-bold">Rate Your Order</h2>
-            <p className="text-white/80 mt-1">How was your experience?</p>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
-            <HiX className="w-6 h-6" />
-          </button>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-6">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-3 text-center">Rating</label>
-          <div className="flex justify-center space-x-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => setReviewData({ ...reviewData, rating: star })}
-                className="focus:outline-none transition-transform hover:scale-110"
-              >
-                <HiStar className={`w-10 h-10 ${star <= reviewData.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Your Review (Optional)</label>
-          <textarea
-            rows={4}
-            value={reviewData.comment}
-            onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none resize-none"
-            placeholder="Tell us about your experience..."
-          />
-        </div>
-
-        <button
-          onClick={onSubmit}
-          className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all"
-        >
-          Submit Review
-        </button>
-      </div>
-    </motion.div>
-  </motion.div>
-);
-
-const ConfirmModal = ({ message, onConfirm, onCancel }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-    onClick={onCancel}
-  >
-    <motion.div
-      initial={{ scale: 0.95, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.95, opacity: 0 }}
-      onClick={(e) => e.stopPropagation()}
-      className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
-    >
-      <div className="p-6 flex items-start gap-3">
-        <HiExclamation className="w-6 h-6 text-amber-600 mt-0.5" />
-        <div className="text-gray-800">
-          <h3 className="text-lg font-semibold mb-1">Confirm action</h3>
-          <p className="text-sm text-gray-600">{message}</p>
-        </div>
-      </div>
-      <div className="px-6 pb-6 flex gap-3 justify-end">
-        <button onClick={onCancel} className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
-          Keep Order
-        </button>
-        <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
-          Cancel Order
-        </button>
-      </div>
-    </motion.div>
-  </motion.div>
-);
 
 export default OrderHistory;
