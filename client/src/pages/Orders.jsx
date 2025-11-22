@@ -489,18 +489,6 @@ const Orders = () => {
 
                 {/* Modal Content */}
                 <div className="p-6 space-y-6">
-                  {/* Order Status */}
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Status</span>
-                      <span
-                        className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-semibold ${statusColors[selectedOrder.status].bg
-                          } ${statusColors[selectedOrder.status].text}`}
-                      >
-                        {selectedOrder.status}
-                      </span>
-                    </div>
-                  </div>
 
                   {/* Order Items */}
                   <div>
