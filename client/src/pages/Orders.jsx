@@ -122,7 +122,8 @@ const Orders = () => {
         }
       );
 
-      setOrders(data.orders || []);
+      // Handle both array and object response formats
+      setOrders(Array.isArray(data) ? data : data.orders || []);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
@@ -217,11 +218,10 @@ const Orders = () => {
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
-              className={`px-6 py-2 rounded-xl font-semibold transition-all ${
-                filterStatus === status
+              className={`px-6 py-2 rounded-xl font-semibold transition-all ${filterStatus === status
                   ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
                   : "text-gray-600 hover:bg-gray-100"
-              }`}
+                }`}
             >
               {status}
               {status !== "All" && (
@@ -393,10 +393,10 @@ const Orders = () => {
                                     order.status === "Pending"
                                       ? "25%"
                                       : order.status === "Preparing"
-                                      ? "50%"
-                                      : order.status === "Out for Delivery"
-                                      ? "75%"
-                                      : "100%",
+                                        ? "50%"
+                                        : order.status === "Out for Delivery"
+                                          ? "75%"
+                                          : "100%",
                                 }}
                               />
                             </div>
@@ -412,8 +412,7 @@ const Orders = () => {
                                   className="flex flex-col items-center"
                                 >
                                   <div
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                                      [
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${[
                                         "Pending",
                                         "Preparing",
                                         "Out for Delivery",
@@ -421,7 +420,7 @@ const Orders = () => {
                                       ].indexOf(order.status) >= idx
                                         ? "bg-primary-500 text-white"
                                         : "bg-gray-200 text-gray-500"
-                                    }`}
+                                      }`}
                                   >
                                     {idx + 1}
                                   </div>
@@ -483,9 +482,8 @@ const Orders = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-gray-600">Status</span>
                       <span
-                        className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-semibold ${
-                          statusColors[selectedOrder.status].bg
-                        } ${statusColors[selectedOrder.status].text}`}
+                        className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-semibold ${statusColors[selectedOrder.status].bg
+                          } ${statusColors[selectedOrder.status].text}`}
                       >
                         {selectedOrder.status}
                       </span>
@@ -612,11 +610,10 @@ const Orders = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Payment Status</span>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            selectedOrder.paymentStatus === "Completed"
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedOrder.paymentStatus === "Completed"
                               ? "bg-green-100 text-green-700"
                               : "bg-yellow-100 text-yellow-700"
-                          }`}
+                            }`}
                         >
                           {selectedOrder.paymentStatus}
                         </span>
@@ -681,11 +678,10 @@ const Orders = () => {
                           className="focus:outline-none transition-transform hover:scale-110"
                         >
                           <HiStar
-                            className={`w-10 h-10 ${
-                              star <= reviewData.rating
+                            className={`w-10 h-10 ${star <= reviewData.rating
                                 ? "text-yellow-400 fill-current"
                                 : "text-gray-300"
-                            }`}
+                              }`}
                           />
                         </button>
                       ))}
@@ -694,12 +690,12 @@ const Orders = () => {
                       {reviewData.rating === 5
                         ? "Excellent! 🎉"
                         : reviewData.rating === 4
-                        ? "Good! 👍"
-                        : reviewData.rating === 3
-                        ? "Average"
-                        : reviewData.rating === 2
-                        ? "Poor"
-                        : "Very Poor"}
+                          ? "Good! 👍"
+                          : reviewData.rating === 3
+                            ? "Average"
+                            : reviewData.rating === 2
+                              ? "Poor"
+                              : "Very Poor"}
                     </p>
                   </div>
 
@@ -789,15 +785,13 @@ const Orders = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.6 }}
-              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${
-                t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
-              }`}
+              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
+                }`}
             >
               <div className="relative">
                 <div
-                  className={`absolute left-0 top-0 h-full w-1 ${
-                    t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
-                  }`}
+                  className={`absolute left-0 top-0 h-full w-1 ${t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
+                    }`}
                 />
                 <div className="p-3 pl-4 pr-10 flex items-start gap-3">
                   <div className="mt-0.5 shrink-0">
