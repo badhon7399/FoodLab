@@ -156,7 +156,9 @@ const OrderHistory = () => {
   const filteredOrders =
     filterStatus === "All"
       ? orders
-      : orders.filter((order) => order.status === filterStatus);
+      : orders.filter(
+        (order) => order.status.toLowerCase() === filterStatus.toLowerCase()
+      );
 
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
@@ -273,6 +275,20 @@ const OrderHistory = () => {
                   }`}
               >
                 {status}
+                {status !== "All" && (
+                  <span
+                    className={`ml-2 px-2 py-0.5 rounded-full text-xs ${filterStatus === status
+                        ? "bg-white/20 text-white"
+                        : "bg-gray-100 text-gray-600"
+                      }`}
+                  >
+                    {
+                      orders.filter(
+                        (o) => o.status.toLowerCase() === status.toLowerCase()
+                      ).length
+                    }
+                  </span>
+                )}
               </button>
             ))}
           </div>
