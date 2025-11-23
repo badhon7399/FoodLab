@@ -216,32 +216,58 @@ const PromoCodes = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl transition-all">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-blue-100 text-sm">Active Codes</p>
-              <h3 className="text-3xl font-bold mt-2">
+              <p className="text-blue-100 text-sm font-medium">Active Codes</p>
+              <h3 className="text-4xl font-bold mt-2">
                 {promoCodes.filter((p) => p.isActive).length}
               </h3>
+              <p className="text-blue-100 text-xs mt-2">Currently available</p>
             </div>
-            <HiTicket className="w-12 h-12 text-white/30" />
+            <HiTicket className="w-16 h-16 text-white/30" />
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl transition-all">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-green-100 text-sm">Total Usage</p>
-              <h3 className="text-3xl font-bold mt-2">
+              <p className="text-green-100 text-sm font-medium">Total Usage</p>
+              <h3 className="text-4xl font-bold mt-2">
                 {promoCodes.reduce((sum, p) => sum + (p.usageCount || 0), 0)}
               </h3>
+              <p className="text-green-100 text-xs mt-2">Times redeemed</p>
             </div>
-            <HiUsers className="w-12 h-12 text-white/30" />
+            <HiUsers className="w-16 h-16 text-white/30" />
           </div>
         </div>
 
-        {/* ... (Other stats cards) ... */}
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-purple-100 text-sm font-medium">Total Codes</p>
+              <h3 className="text-4xl font-bold mt-2">
+                {promoCodes.length}
+              </h3>
+              <p className="text-purple-100 text-xs mt-2">All time created</p>
+            </div>
+            <HiTag className="w-16 h-16 text-white/30" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-orange-100 text-sm font-medium">Expired</p>
+              <h3 className="text-4xl font-bold mt-2">
+                {promoCodes.filter((p) => isExpired(p.validUntil)).length}
+              </h3>
+              <p className="text-orange-100 text-xs mt-2">No longer valid</p>
+            </div>
+            <HiClock className="w-16 h-16 text-white/30" />
+          </div>
+        </div>
       </div>
 
       {/* Promo Codes Grid */}
