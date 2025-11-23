@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/slices/cartSlice.js";
 import api from "../utils/api.js";
 import {
@@ -30,6 +30,9 @@ export default function FoodDetail() {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewData, setReviewData] = useState({ rating: 5, comment: "" });
+  const { token } = useSelector((state) => state.auth);
 
   useEffect(() => {
     let mounted = true;
@@ -78,6 +81,28 @@ export default function FoodDetail() {
       }
       setIsAddedToCart(true);
       setTimeout(() => setIsAddedToCart(false), 2000);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    try {
+      await api.post("/reviews", {
+        food: food._id,
+        rating: reviewData.rating,
+        comment: reviewData.comment,
+      });
+      setShowReviewModal(false);
+      setReviewData({ rating: 5, comment: "" });
+      // Refresh reviews
+      const { data } = await api.get(`/food/${id}/reviews`);
+      setReviews(data?.data || []);
+    } catch (error) {
+      console.error("Failed to submit review", error);
+      alert(error.response?.data?.message || "Failed to submit review");
     }
   };
 
@@ -567,6 +592,7 @@ export default function FoodDetail() {
             <motion.button
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setShowReviewModal(true)}
               className="px-6 py-3 bg-gradient-to-r from-primary-500 to-orange-500 text-white rounded-full font-bold shadow-lg hover:shadow-xl transition-all"
             >
               Write a Review
@@ -608,6 +634,7 @@ export default function FoodDetail() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setShowReviewModal(true)}
                 className="px-8 py-3 bg-gradient-to-r from-primary-500 to-orange-500 text-white rounded-full font-bold shadow-lg"
               >
                 Write the First Review
@@ -667,6 +694,78 @@ export default function FoodDetail() {
           )}
         </motion.section>
       </div>
+
+      {/* Review Modal */}
+      <AnimatePresence>
+        {showReviewModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            onClick={() => setShowReviewModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+            >
+              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-8 text-white text-center">
+                <h2 className="text-3xl font-bold mb-2">Rate Food</h2>
+                <p className="opacity-90">How was your food?</p>
+              </div>
+
+              <div className="p-8">
+                <div className="flex justify-center gap-2 mb-8">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() =>
+                        setReviewData({ ...reviewData, rating: star })
+                      }
+                      className="transition-transform hover:scale-110 focus:outline-none"
+                    >
+                      <HiStar
+                        className={`w-10 h-10 ${star <= reviewData.rating
+                          ? "text-yellow-400"
+                          : "text-gray-200"
+                          }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  rows={4}
+                  value={reviewData.comment}
+                  onChange={(e) =>
+                    setReviewData({ ...reviewData, comment: e.target.value })
+                  }
+                  className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-yellow-400 resize-none mb-6"
+                  placeholder="Share your experience..."
+                />
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowReviewModal(false)}
+                    className="flex-1 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmitReview}
+                    className="flex-1 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl font-bold shadow-lg shadow-orange-200 hover:shadow-xl transition-all"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
