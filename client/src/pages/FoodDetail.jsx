@@ -79,7 +79,7 @@ export default function FoodDetail() {
     const checkFavorite = async () => {
       if (!token) return;
       try {
-        const { data } = await api.get("/user/favorites");
+        const { data } = await api.get("/users/favorites");
         if (mounted) {
           const isFav = data.some((fav) => (typeof fav === 'string' ? fav : fav._id) === id);
           setIsFavorite(isFav);
@@ -142,7 +142,7 @@ export default function FoodDetail() {
       return;
     }
     try {
-      const { data } = await api.post("/user/favorites", { foodId: id });
+      const { data } = await api.post("/users/favorites", { foodId: id });
       setIsFavorite(data.favorites.includes(id));
     } catch (error) {
       console.error("Failed to toggle favorite", error);
