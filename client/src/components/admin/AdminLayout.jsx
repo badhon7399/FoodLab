@@ -37,12 +37,12 @@ const AdminLayout = () => {
         setIsSidebarOpen(false);
       }
     };
-    
+
     // Set initial state
     if (window.innerWidth >= 1024) {
       setIsSidebarOpen(true);
     }
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -137,7 +137,7 @@ const AdminLayout = () => {
 
   return (
     <div
-      className={`min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}
+      className={`min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gradient-to-br from-gray-50 via-orange-50/30 to-gray-100"}`}
     >
       {/* Mobile Overlay */}
       <AnimatePresence>
@@ -153,25 +153,23 @@ const AdminLayout = () => {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <Sidebar 
-        isOpen={isSidebarOpen} 
+      <Sidebar
+        isOpen={isSidebarOpen}
         isDarkMode={isDarkMode}
         onClose={closeSidebar}
       />
 
       {/* Main Content */}
       <div
-        className={`transition-all duration-300 ${
-          isSidebarOpen ? "lg:ml-64" : "lg:ml-20"
-        } ml-0`}
+        className={`transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "lg:ml-20"
+          } ml-0`}
       >
         {/* Top Navigation Bar */}
         <nav
-          className={`sticky top-0 z-30 ${
-            isDarkMode
+          className={`sticky top-0 z-30 ${isDarkMode
               ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-200"
-          } border-b shadow-sm`}
+            } border-b shadow-sm`}
         >
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
@@ -179,29 +177,25 @@ const AdminLayout = () => {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={toggleSidebar}
-                  className={`p-2 rounded-lg ${
-                    isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                  } transition-colors`}
+                  className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
+                    } transition-colors`}
                 >
                   <HiMenuAlt2
-                    className={`w-6 h-6 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
-                    }`}
+                    className={`w-6 h-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                      }`}
                   />
                 </button>
 
                 <div>
                   <h2
-                    className={`text-xl font-bold ${
-                      isDarkMode ? "text-white" : "text-gray-800"
-                    }`}
+                    className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"
+                      }`}
                   >
                     Food Lab Admin
                   </h2>
                   <p
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+                    className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
                   >
                     Welcome back, {user?.name}! 👋
                   </p>
@@ -213,22 +207,20 @@ const AdminLayout = () => {
                 {/* Back to Home */}
                 <Link
                   to="/"
-                  className={`hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${
-                    isDarkMode
+                  className={`hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${isDarkMode
                       ? "border-gray-700 text-gray-200 hover:bg-gray-700"
                       : "border-gray-200 text-gray-700 hover:bg-gray-50"
-                  } transition-colors`}
+                    } transition-colors`}
                 >
                   <HiHome className="w-5 h-5" />
                   <span>Home</span>
                 </Link>
                 <Link
                   to="/"
-                  className={`md:hidden p-2 rounded-lg ${
-                    isDarkMode
+                  className={`md:hidden p-2 rounded-lg ${isDarkMode
                       ? "hover:bg-gray-700 text-gray-300"
                       : "hover:bg-gray-100 text-gray-600"
-                  } transition-colors`}
+                    } transition-colors`}
                   aria-label="Go to Home"
                 >
                   <HiHome className="w-5 h-5" />
@@ -236,9 +228,8 @@ const AdminLayout = () => {
                 {/* Dark Mode Toggle */}
                 <button
                   onClick={() => setIsDarkMode(!isDarkMode)}
-                  className={`p-2 rounded-lg ${
-                    isDarkMode ? "bg-gray-700" : "bg-gray-100"
-                  } transition-colors`}
+                  className={`p-2 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                    } transition-colors`}
                 >
                   {isDarkMode ? (
                     <HiSun className="w-5 h-5 text-yellow-400" />
@@ -251,14 +242,12 @@ const AdminLayout = () => {
                 <div className="relative" ref={notificationRef}>
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className={`relative p-2 rounded-lg ${
-                      isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                    } transition-colors`}
+                    className={`relative p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
+                      } transition-colors`}
                   >
                     <HiBell
-                      className={`w-5 h-5 md:w-6 md:h-6 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
+                      className={`w-5 h-5 md:w-6 md:h-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
                     />
                     {unreadCount > 0 && (
                       <span className="absolute top-0 right-0 w-4 h-4 md:w-5 md:h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
@@ -274,18 +263,15 @@ const AdminLayout = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className={`absolute right-0 mt-2 w-72 sm:w-80 md:w-96 ${
-                          isDarkMode ? "bg-gray-800" : "bg-white"
-                        } rounded-xl shadow-2xl border ${
-                          isDarkMode ? "border-gray-700" : "border-gray-200"
-                        } overflow-hidden z-50`}
+                        className={`absolute right-0 mt-2 w-72 sm:w-80 md:w-96 ${isDarkMode ? "bg-gray-800" : "bg-white"
+                          } rounded-xl shadow-2xl border ${isDarkMode ? "border-gray-700" : "border-gray-200"
+                          } overflow-hidden z-50`}
                       >
                         <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
                           <div className="flex items-center justify-between">
                             <h3
-                              className={`font-bold text-sm md:text-base ${
-                                isDarkMode ? "text-white" : "text-gray-800"
-                              }`}
+                              className={`font-bold text-sm md:text-base ${isDarkMode ? "text-white" : "text-gray-800"
+                                }`}
                             >
                               Notifications
                             </h3>
@@ -317,17 +303,15 @@ const AdminLayout = () => {
                                 key={notification.id}
                                 to={notification.link || "#"}
                                 onClick={() => setShowNotifications(false)}
-                                className={`block p-3 md:p-4 border-b ${
-                                  isDarkMode
+                                className={`block p-3 md:p-4 border-b ${isDarkMode
                                     ? "border-gray-700 hover:bg-gray-700"
                                     : "border-gray-100 hover:bg-gray-50"
-                                } transition-colors ${
-                                  notification.unread
+                                  } transition-colors ${notification.unread
                                     ? isDarkMode
                                       ? "bg-blue-900/20"
                                       : "bg-blue-50"
                                     : ""
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-start space-x-3">
                                   <div
@@ -340,9 +324,8 @@ const AdminLayout = () => {
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between gap-2">
                                       <p
-                                        className={`text-xs md:text-sm font-semibold ${
-                                          isDarkMode ? "text-white" : "text-gray-900"
-                                        }`}
+                                        className={`text-xs md:text-sm font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                                          }`}
                                       >
                                         {notification.title}
                                       </p>
@@ -351,25 +334,22 @@ const AdminLayout = () => {
                                       )}
                                     </div>
                                     <p
-                                      className={`text-xs md:text-sm mt-1 ${
-                                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                                      }`}
+                                      className={`text-xs md:text-sm mt-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                                        }`}
                                     >
                                       {notification.message}
                                     </p>
                                     {notification.amount && (
                                       <p
-                                        className={`text-xs md:text-sm font-semibold mt-1 ${
-                                          isDarkMode ? "text-green-400" : "text-green-600"
-                                        }`}
+                                        className={`text-xs md:text-sm font-semibold mt-1 ${isDarkMode ? "text-green-400" : "text-green-600"
+                                          }`}
                                       >
                                         ৳{notification.amount.toLocaleString()}
                                       </p>
                                     )}
                                     <p
-                                      className={`text-xs mt-1 ${
-                                        isDarkMode ? "text-gray-500" : "text-gray-500"
-                                      }`}
+                                      className={`text-xs mt-1 ${isDarkMode ? "text-gray-500" : "text-gray-500"
+                                        }`}
                                     >
                                       {notification.timeAgo || "Just now"}
                                     </p>
@@ -402,11 +382,10 @@ const AdminLayout = () => {
                   </div>
                   <button
                     onClick={handleLogout}
-                    className={`p-2 rounded-lg ${
-                      isDarkMode
+                    className={`p-2 rounded-lg ${isDarkMode
                         ? "hover:bg-gray-700 text-gray-300"
                         : "hover:bg-gray-100 text-gray-600"
-                    } transition-colors`}
+                      } transition-colors`}
                   >
                     <HiLogout className="w-5 h-5" />
                   </button>
