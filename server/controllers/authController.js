@@ -21,6 +21,7 @@ function formatUser(user) {
         department: user.department,
         studentId: user.studentId,
         avatar: user.avatar,
+        createdAt: user.createdAt,
     }
 }
 

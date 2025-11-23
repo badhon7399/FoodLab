@@ -122,10 +122,10 @@ const ProfileOverview = ({ userStats }) => {
           <InfoItem
             icon={HiCalendar}
             label="Member Since"
-            value={new Date(user?.createdAt).toLocaleDateString('en-US', {
+            value={user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
               month: 'long',
               year: 'numeric',
-            })}
+            }) : 'N/A'}
           />
         </div>
       </div>
@@ -147,7 +147,7 @@ const ProfileOverview = ({ userStats }) => {
                   className="w-20 h-20 object-cover rounded-lg mx-auto mb-3"
                 />
                 <h4 className="font-semibold text-gray-900">{item.name}</h4>
-                <p className="text-sm text-gray-500">{item.count} orders</p>
+                <p className="text-sm text-gray-500">৳{item.price}</p>
               </motion.div>
             ))}
           </div>

@@ -54,22 +54,15 @@ export const uploadAvatar = asyncWrap(async (req, res) => {
 })
 
 export const getStats = asyncWrap(async (req, res) => {
-  const orders = await Order.find({ user: req.userId })
+  const [orders, user] = await Promise.all([
+    Order.find({ user: req.userId }),
+    User.findById(req.userId).populate('favorites')
+  ])
+
   const totalOrders = orders.length
   const totalSpent = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0)
-  // Derive top items from orders
-  const itemMap = new Map()
-  for (const o of orders) {
-    for (const it of o.items) {
-      const key = it.name
-      const prev = itemMap.get(key) || { name: it.name, image: it.image, count: 0, _id: it.food }
-      prev.count += it.quantity
-      itemMap.set(key, prev)
-    }
-  }
-  const favoriteItems = Array.from(itemMap.values())
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 6)
+
+  const favoriteItems = user.favorites || []
 
   res.json({ totalOrders, totalSpent, favoriteItems })
 })
