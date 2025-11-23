@@ -132,7 +132,7 @@ const AboutUs = () => {
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
         </div>
 
-        <div className="container mx-auto px-4 py-24 relative z-10">
+        <div className="container mx-auto px-4 pt-32 pb-24 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}

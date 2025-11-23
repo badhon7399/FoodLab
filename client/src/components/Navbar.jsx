@@ -70,11 +70,10 @@ const Navbar = ({ onCartClick }) => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled || !isHomePage
+      className={`fixed w-full z-50 transition-all duration-300 ${isScrolled || !isHomePage
           ? "bg-white/80 backdrop-blur-md shadow-lg py-3"
           : "bg-transparent py-5"
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
@@ -89,16 +88,14 @@ const Navbar = ({ onCartClick }) => {
             </motion.div>
             <div>
               <h1
-                className={`text-2xl font-heading font-bold ${
-                  shouldUseDarkText ? "text-dark" : "text-white"
-                }`}
+                className={`text-2xl font-heading font-bold ${shouldUseDarkText ? "text-dark" : "text-white"
+                  }`}
               >
                 Food Lab
               </h1>
               <p
-                className={`text-xs ${
-                  shouldUseDarkText ? "text-gray-600" : "text-gray-200"
-                }`}
+                className={`text-xs ${shouldUseDarkText ? "text-gray-600" : "text-gray-200"
+                  }`}
               >
                 CUET Campus
               </p>
@@ -106,17 +103,15 @@ const Navbar = ({ onCartClick }) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link key={link.path} to={link.path} className="relative group">
                 <span
-                  className={`font-medium transition-colors ${
-                    shouldUseDarkText
+                  className={`font-medium transition-colors ${shouldUseDarkText
                       ? "text-dark hover:text-primary-500"
                       : "text-white hover:text-accent-yellow"
-                  } ${
-                    location.pathname === link.path ? "text-primary-500" : ""
-                  }`}
+                    } ${location.pathname === link.path ? "text-primary-500" : ""
+                    }`}
                 >
                   {link.name}
                 </span>
@@ -131,15 +126,13 @@ const Navbar = ({ onCartClick }) => {
             {isAdmin && (
               <Link to="/admin" className="relative group">
                 <span
-                  className={`font-medium transition-colors ${
-                    shouldUseDarkText
+                  className={`font-medium transition-colors ${shouldUseDarkText
                       ? "text-dark hover:text-primary-500"
                       : "text-white hover:text-accent-yellow"
-                  } ${
-                    location.pathname.startsWith("/admin")
+                    } ${location.pathname.startsWith("/admin")
                       ? "text-primary-500"
                       : ""
-                  }`}
+                    }`}
                 >
                   Admin
                 </span>
@@ -160,14 +153,12 @@ const Navbar = ({ onCartClick }) => {
               onClick={onCartClick}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className={`relative p-2 rounded-full ${
-                shouldUseDarkText ? "bg-gray-100" : "bg-white/20"
-              }`}
+              className={`relative p-2 rounded-full ${shouldUseDarkText ? "bg-gray-100" : "bg-white/20"
+                }`}
             >
               <HiShoppingCart
-                className={`w-6 h-6 ${
-                  shouldUseDarkText ? "text-dark" : "text-white"
-                }`}
+                className={`w-6 h-6 ${shouldUseDarkText ? "text-dark" : "text-white"
+                  }`}
               />
               {cartItemCount > 0 && (
                 <motion.span
@@ -190,7 +181,7 @@ const Navbar = ({ onCartClick }) => {
                   className="flex items-center space-x-2 bg-primary-500 text-white px-4 py-2 rounded-full"
                 >
                   <HiUser className="w-5 h-5" />
-                  <span className="hidden md:block font-medium">
+                  <span className="hidden lg:block font-medium">
                     {user.name}
                   </span>
                 </motion.button>
@@ -254,19 +245,17 @@ const Navbar = ({ onCartClick }) => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2"
+              className="lg:hidden p-2"
             >
               {isMobileMenuOpen ? (
                 <HiX
-                  className={`w-7 h-7 ${
-                    shouldUseDarkText ? "text-dark" : "text-white"
-                  }`}
+                  className={`w-7 h-7 ${shouldUseDarkText ? "text-dark" : "text-white"
+                    }`}
                 />
               ) : (
                 <HiMenuAlt3
-                  className={`w-7 h-7 ${
-                    shouldUseDarkText ? "text-dark" : "text-white"
-                  }`}
+                  className={`w-7 h-7 ${shouldUseDarkText ? "text-dark" : "text-white"
+                    }`}
                 />
               )}
             </button>
@@ -280,18 +269,17 @@ const Navbar = ({ onCartClick }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden mt-4 bg-white rounded-lg shadow-xl overflow-hidden"
+              className="lg:hidden mt-4 bg-white rounded-lg shadow-xl overflow-hidden"
             >
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block px-6 py-3 hover:bg-gray-50 ${
-                    location.pathname === link.path
+                  className={`block px-6 py-3 hover:bg-gray-50 ${location.pathname === link.path
                       ? "bg-primary-50 text-primary-500"
                       : "text-dark"
-                  }`}
+                    }`}
                 >
                   {link.name}
                 </Link>
@@ -300,11 +288,10 @@ const Navbar = ({ onCartClick }) => {
                 <Link
                   to="/admin"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block px-6 py-3 hover:bg-gray-50 ${
-                    location.pathname.startsWith("/admin")
+                  className={`block px-6 py-3 hover:bg-gray-50 ${location.pathname.startsWith("/admin")
                       ? "bg-primary-50 text-primary-500"
                       : "text-dark"
-                  }`}
+                    }`}
                 >
                   Admin
                 </Link>

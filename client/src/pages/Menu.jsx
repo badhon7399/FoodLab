@@ -76,7 +76,7 @@ const Menu = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-16">
+    <div className="min-h-screen bg-gray-50 pt-32 pb-16">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
@@ -118,8 +118,8 @@ const Menu = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveCategory(category)}
                 className={`px-6 py-3 rounded-full font-semibold transition-all ${activeCategory === category
-                    ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
-                    : "bg-white text-gray-700 hover:bg-gray-100"
+                  ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
+                  : "bg-white text-gray-700 hover:bg-gray-100"
                   }`}
               >
                 {category}
