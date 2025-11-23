@@ -61,41 +61,6 @@ export default function FoodDetail() {
 
     fetchFood();
     return () => {
-      mounted = false;
-    };
-  }, [id]);
-
-  useEffect(() => {
-    let mounted = true;
-    const fetchReviews = async () => {
-      try {
-        setReviewsLoading(true);
-        let res;
-        try {
-          res = await api.get(`/food/${id}/reviews`);
-        } catch (_) {
-          try {
-            res = await api.get(`/reviews/food/${id}`);
-          } catch (_) {
-            res = await api.get(`/reviews`, { params: { food: id } });
-          }
-        }
-        const list =
-          res?.data?.data ||
-          res?.data?.reviews ||
-          (Array.isArray(res?.data) ? res.data : []);
-        if (!mounted) return;
-        setReviews(Array.isArray(list) ? list : []);
-      } catch {
-        if (mounted) setReviews([]);
-      } finally {
-        if (mounted) setReviewsLoading(false);
-      }
-    };
-
-    fetchReviews();
-    return () => {
-      mounted = false;
     };
   }, [id]);
 
@@ -498,8 +463,8 @@ export default function FoodDetail() {
                 onClick={food.isAvailable ? handleAddToCart : undefined}
                 disabled={!food.isAvailable}
                 className={`relative flex-1 px-8 py-5 rounded-2xl font-black text-lg shadow-2xl overflow-hidden group ${food.isAvailable
-                    ? "bg-gradient-to-r from-primary-500 via-primary-600 to-orange-500 text-white"
-                    : "bg-gray-200 text-gray-500 cursor-not-allowed shadow-none"
+                  ? "bg-gradient-to-r from-primary-500 via-primary-600 to-orange-500 text-white"
+                  : "bg-gray-200 text-gray-500 cursor-not-allowed shadow-none"
                   }`}
               >
                 {food.isAvailable && (

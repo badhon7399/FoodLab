@@ -19,6 +19,7 @@ import orderRoutes from './routes/order.js'
 import paymentRoutes from './routes/payment.js'
 import adminRoutes from './routes/admin.js'
 import userRoutes from './routes/user.js'
+import reviewRoutes from './routes/review.js'
 import { notFound, errorHandler } from './middleware/errorHandler.js'
 import dns from 'dns'
 dns.setDefaultResultOrder('ipv4first')
@@ -90,6 +91,7 @@ app.use('/api/orders', orderRoutes)
 app.use('/api/payments', paymentRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/reviews', reviewRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
