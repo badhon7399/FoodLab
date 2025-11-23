@@ -62,7 +62,22 @@ export default function FoodDetail() {
       }
     };
 
+    const fetchReviews = async () => {
+      try {
+        setReviewsLoading(true);
+        const { data } = await api.get(`/food/${id}/reviews`);
+        if (mounted) {
+          setReviews(data?.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch reviews", error);
+      } finally {
+        if (mounted) setReviewsLoading(false);
+      }
+    };
+
     fetchFood();
+    fetchReviews();
     return () => {
     };
   }, [id]);
