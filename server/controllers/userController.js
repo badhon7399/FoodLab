@@ -184,3 +184,23 @@ export const deleteAccount = asyncWrap(async (req, res) => {
   await User.findByIdAndUpdate(req.userId, { isActive: false })
   res.json({ success: true })
 })
+
+export const toggleFavorite = asyncWrap(async (req, res) => {
+  const { foodId } = req.body
+  const user = await User.findById(req.userId)
+
+  const index = user.favorites.indexOf(foodId)
+  if (index === -1) {
+    user.favorites.push(foodId)
+  } else {
+    user.favorites.splice(index, 1)
+  }
+
+  await user.save()
+  res.json({ favorites: user.favorites })
+})
+
+export const getFavorites = asyncWrap(async (req, res) => {
+  const user = await User.findById(req.userId).populate('favorites')
+  res.json(user.favorites)
+})

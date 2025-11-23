@@ -76,11 +76,26 @@ export default function FoodDetail() {
       }
     };
 
+    const checkFavorite = async () => {
+      if (!token) return;
+      try {
+        const { data } = await api.get("/user/favorites");
+        if (mounted) {
+          const isFav = data.some((fav) => (typeof fav === 'string' ? fav : fav._id) === id);
+          setIsFavorite(isFav);
+        }
+      } catch (error) {
+        console.error("Failed to check favorites", error);
+      }
+    };
+
     fetchFood();
     fetchReviews();
+    checkFavorite();
     return () => {
+      mounted = false;
     };
-  }, [id]);
+  }, [id, token]);
 
   const rating = useMemo(() => {
     if (!food?.rating && !reviews?.length) return 0;
@@ -118,6 +133,19 @@ export default function FoodDetail() {
     } catch (error) {
       console.error("Failed to submit review", error);
       alert(error.response?.data?.message || "Failed to submit review");
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    try {
+      const { data } = await api.post("/user/favorites", { foodId: id });
+      setIsFavorite(data.favorites.includes(id));
+    } catch (error) {
+      console.error("Failed to toggle favorite", error);
     }
   };
 
@@ -547,7 +575,7 @@ export default function FoodDetail() {
               <motion.button
                 whileHover={{ scale: 1.1, rotate: 10 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsFavorite(!isFavorite)}
+                onClick={handleToggleFavorite}
                 className={`px-6 py-5 rounded-2xl font-bold transition-all duration-300 shadow-lg ${isFavorite
                   ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
                   : "bg-white border-2 border-gray-200 text-gray-400 hover:border-pink-300 hover:text-pink-500"

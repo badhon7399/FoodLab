@@ -15,6 +15,8 @@ import {
   updateSettings,
   changePassword,
   deleteAccount,
+  toggleFavorite,
+  getFavorites,
 } from '../controllers/userController.js'
 
 const router = Router()
@@ -25,6 +27,8 @@ router.put('/profile', protect, updateProfile)
 router.post('/upload-avatar', protect, uploadUserAvatar, uploadAvatar)
 
 router.get('/stats', protect, getStats)
+router.get('/favorites', protect, getFavorites)
+router.post('/favorites', protect, toggleFavorite)
 
 router.get('/addresses', protect, listAddresses)
 router.post('/addresses', protect, createAddress)
