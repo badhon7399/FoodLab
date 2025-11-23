@@ -6,7 +6,7 @@ import asyncWrap from '../utils/asyncHandler.js';
 // @desc    Get reviews for a food
 // @route   GET /api/food/:id/reviews
 export const getFoodReviews = asyncWrap(async (req, res) => {
-    const reviews = await Review.find({ food: req.params.id, isApproved: true })
+    const reviews = await Review.find({ food: req.params.id })
         .populate('user', 'name')
         .sort('-createdAt')
 
