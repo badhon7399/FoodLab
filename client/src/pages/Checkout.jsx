@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-  HiShoppingCart,
   HiCreditCard,
   HiLocationMarker,
   HiPhone,
@@ -15,7 +14,7 @@ import {
   HiExclamation,
   HiChevronLeft,
   HiTruck,
-  HiCash,
+  HiCurrencyDollar,
   HiClock,
 } from "react-icons/hi";
 import axios from "axios";
@@ -63,7 +62,7 @@ const Checkout = () => {
     "Shah Hall",
     "Saheed Tarek Huda Hall",
     "Muktizoddha Hall",
-  
+
     "Others",
   ];
 
@@ -267,11 +266,10 @@ const Checkout = () => {
               <div key={s.number} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                      step >= s.number
-                        ? "bg-primary-500 text-white shadow-lg"
-                        : "bg-gray-200 text-gray-500"
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= s.number
+                      ? "bg-primary-500 text-white shadow-lg"
+                      : "bg-gray-200 text-gray-500"
+                      }`}
                   >
                     {step > s.number ? (
                       <HiCheckCircle className="w-6 h-6" />
@@ -280,18 +278,16 @@ const Checkout = () => {
                     )}
                   </div>
                   <span
-                    className={`text-xs mt-2 font-medium ${
-                      step >= s.number ? "text-primary-500" : "text-gray-500"
-                    }`}
+                    className={`text-xs mt-2 font-medium ${step >= s.number ? "text-primary-500" : "text-gray-500"
+                      }`}
                   >
                     {s.label}
                   </span>
                 </div>
                 {index < 2 && (
                   <div
-                    className={`w-20 h-1 mx-2 ${
-                      step > s.number ? "bg-primary-500" : "bg-gray-200"
-                    }`}
+                    className={`w-20 h-1 mx-2 ${step > s.number ? "bg-primary-500" : "bg-gray-200"
+                      }`}
                   />
                 )}
               </div>
@@ -526,11 +522,10 @@ const Checkout = () => {
                   <div className="space-y-3">
                     {/* Bkash */}
                     <label
-                      className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                        paymentMethod === "Bkash"
-                          ? "border-pink-500 bg-pink-50"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
+                      className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === "Bkash"
+                        ? "border-pink-500 bg-pink-50"
+                        : "border-gray-200 hover:border-gray-300"
+                        }`}
                     >
                       <div className="flex items-center space-x-4">
                         <input
@@ -560,11 +555,10 @@ const Checkout = () => {
 
                     {/* Cash on Delivery */}
                     <label
-                      className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                        paymentMethod === "Cash on Delivery"
-                          ? "border-green-500 bg-green-50"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
+                      className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === "Cash on Delivery"
+                        ? "border-green-500 bg-green-50"
+                        : "border-gray-200 hover:border-gray-300"
+                        }`}
                     >
                       <div className="flex items-center space-x-4">
                         <input
@@ -577,7 +571,7 @@ const Checkout = () => {
                         />
                         <div className="flex items-center space-x-3">
                           <div className="bg-green-500 p-2 rounded-lg">
-                            <HiCash className="w-6 h-6 text-white" />
+                            <HiCurrencyDollar className="w-6 h-6 text-white" />
                           </div>
                           <div>
                             <p className="font-semibold text-gray-900">
@@ -755,9 +749,8 @@ const Checkout = () => {
                     <span>Delivery Fee</span>
                   </div>
                   <span
-                    className={`font-semibold ${
-                      deliveryFee === 0 ? "text-green-600" : ""
-                    }`}
+                    className={`font-semibold ${deliveryFee === 0 ? "text-green-600" : ""
+                      }`}
                   >
                     {deliveryFee === 0 ? "FREE" : `৳${deliveryFee}`}
                   </span>
@@ -784,7 +777,7 @@ const Checkout = () => {
                     Estimated Delivery
                   </span>
                 </div>
-                <p className="text-sm text-blue-800">25-35 minutes</p>
+                <p className="text-sm text-blue-800">25-35 minutes (After the food is prepared)</p>
               </div>
 
               {/* Security Badge */}

@@ -10,7 +10,7 @@ export const listFoods = asyncWrap(async (req, res) => {
 // @desc    Get popular foods
 // @route   GET /api/food/popular
 export const getPopularFoods = asyncWrap(async (req, res) => {
-    const foods = await Food.find({ isAvailable: true, isPopular: true })
+    const foods = await Food.find({ isPopular: true })
         .sort('-soldCount -rating')
         .limit(12)
     res.json({ success: true, data: foods })
@@ -19,7 +19,7 @@ export const getPopularFoods = asyncWrap(async (req, res) => {
 // @desc    Get featured foods
 // @route   GET /api/food/featured
 export const getFeaturedFoods = asyncWrap(async (req, res) => {
-    const foods = await Food.find({ isAvailable: true, isFeatured: true })
+    const foods = await Food.find({ isFeatured: true })
         .sort('-rating -soldCount')
         .limit(12)
     res.json({ success: true, data: foods })
@@ -28,7 +28,7 @@ export const getFeaturedFoods = asyncWrap(async (req, res) => {
 // @desc    Get new arrival foods
 // @route   GET /api/food/new-arrival
 export const getNewArrivalFoods = asyncWrap(async (req, res) => {
-    const foods = await Food.find({ isAvailable: true, isNewArrival: true })
+    const foods = await Food.find({ isNewArrival: true })
         .sort('-createdAt')
         .limit(12)
     res.json({ success: true, data: foods })

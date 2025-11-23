@@ -69,9 +69,8 @@ const FoodCard = ({ food: incomingFood }) => {
               e.stopPropagation();
               if (food?._id) dispatch(toggleFavorite(food._id));
             }}
-            className={`ml-auto p-2 rounded-full backdrop-blur-lg transition-all ${
-              isFav ? "bg-accent-red text-white" : "bg-white/80 text-gray-600"
-            }`}
+            className={`ml-auto p-2 rounded-full backdrop-blur-lg transition-all ${isFav ? "bg-accent-red text-white" : "bg-white/80 text-gray-600"
+              }`}
           >
             <HiHeart className={`w-5 h-5 ${isFav ? "fill-current" : ""}`} />
           </motion.button>
@@ -104,11 +103,10 @@ const FoodCard = ({ food: incomingFood }) => {
           {[...Array(5)].map((_, i) => (
             <HiStar
               key={i}
-              className={`w-4 h-4 ${
-                i < Math.floor(food.rating)
+              className={`w-4 h-4 ${i < Math.floor(food.rating)
                   ? "text-accent-yellow fill-current"
                   : "text-gray-300"
-              }`}
+                }`}
             />
           ))}
           <span className="text-sm text-gray-600 ml-2">({food.rating})</span>
@@ -126,16 +124,26 @@ const FoodCard = ({ food: incomingFood }) => {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleAddToCart}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg hover:from-primary-600 hover:to-primary-700 hover:shadow-glow active:scale-95 transition-all"
-            aria-label="Add to cart"
-            title="Add to cart"
+            whileHover={food.isAvailable ? { scale: 1.03 } : {}}
+            whileTap={food.isAvailable ? { scale: 0.98 } : {}}
+            onClick={food.isAvailable ? handleAddToCart : undefined}
+            disabled={!food.isAvailable}
+            className={`inline-flex items-center gap-2 px-4 py-2 md:px-5 md:py-3 rounded-full font-semibold shadow-lg transition-all ${food.isAvailable
+                ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 hover:shadow-glow active:scale-95"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
+              }`}
+            aria-label={food.isAvailable ? "Add to cart" : "Unavailable"}
+            title={food.isAvailable ? "Add to cart" : "Unavailable"}
           >
-            <HiShoppingCart className="w-5 h-5" />
-            <span className="hidden sm:inline">Add to Cart</span>
-            <span className="sm:hidden">Add</span>
+            {food.isAvailable ? (
+              <>
+                <HiShoppingCart className="w-5 h-5" />
+                <span className="hidden sm:inline">Add to Cart</span>
+                <span className="sm:hidden">Add</span>
+              </>
+            ) : (
+              <span>Unavailable</span>
+            )}
           </motion.button>
         </div>
       </div>

@@ -40,6 +40,11 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
     status: { $in: ['Pending', 'Preparing'] },
   });
 
+  // Pending transactions
+  const pendingTransactions = await Transaction.countDocuments({
+    status: 'Pending',
+  });
+
   // Low stock items (less than 10)
   const lowStockItems = await Food.countDocuments({
     stock: { $ne: null, $lt: 10 },
@@ -114,6 +119,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
       totalUsers,
       totalRevenue: totalRevenue[0]?.total || 0,
       pendingOrders,
+      pendingTransactions,
       periodOrders,
       periodRevenue: periodRevenue[0]?.total || 0,
       todayOrders,

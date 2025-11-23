@@ -35,7 +35,7 @@ const Menu = () => {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await api.get("/food");
+      const { data } = await api.get("/food?includeInactive=true");
       // Handle backend response structure: { success: true, data: [...] }
       const items =
         data?.data || (Array.isArray(data) ? data : data.foods || []);
@@ -117,11 +117,10 @@ const Menu = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveCategory(category)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                  activeCategory === category
+                className={`px-6 py-3 rounded-full font-semibold transition-all ${activeCategory === category
                     ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
                     : "bg-white text-gray-700 hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 {category}
               </motion.button>

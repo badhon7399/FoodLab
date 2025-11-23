@@ -168,7 +168,7 @@ const Analytics = () => {
               <p className="text-green-100 text-sm font-medium">
                 Total Revenue
               </p>
-              <h3 className="text-2xl md:text-3xl font-bold mt-2">৳45,230</h3>
+              <h3 className="text-2xl md:text-3xl font-bold mt-2">৳{analytics.totalRevenue?.toLocaleString()}</h3>
             </div>
             <div className="bg-white/20 p-3 rounded-xl">
               <HiCurrencyDollar className="w-8 h-8" />
@@ -189,7 +189,7 @@ const Analytics = () => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <p className="text-blue-100 text-sm font-medium">Total Orders</p>
-              <h3 className="text-2xl md:text-3xl font-bold mt-2">1,234</h3>
+              <h3 className="text-2xl md:text-3xl font-bold mt-2">{analytics.totalOrders?.toLocaleString()}</h3>
             </div>
             <div className="bg-white/20 p-3 rounded-xl">
               <HiShoppingCart className="w-8 h-8" />
@@ -212,7 +212,7 @@ const Analytics = () => {
               <p className="text-purple-100 text-sm font-medium">
                 Avg Order Value
               </p>
-              <h3 className="text-2xl md:text-3xl font-bold mt-2">৳367</h3>
+              <h3 className="text-2xl md:text-3xl font-bold mt-2">৳{Math.round(analytics.averageOrderValue || 0).toLocaleString()}</h3>
             </div>
             <div className="bg-white/20 p-3 rounded-xl">
               <HiCurrencyDollar className="w-8 h-8" />
@@ -235,7 +235,7 @@ const Analytics = () => {
               <p className="text-orange-100 text-sm font-medium">
                 New Customers
               </p>
-              <h3 className="text-2xl md:text-3xl font-bold mt-2">156</h3>
+              <h3 className="text-2xl md:text-3xl font-bold mt-2">{analytics.newCustomers?.toLocaleString()}</h3>
             </div>
             <div className="bg-white/20 p-3 rounded-xl">
               <HiUsers className="w-8 h-8" />
@@ -462,9 +462,17 @@ const Analytics = () => {
               <h3 className="font-bold text-gray-900 text-sm md:text-base">Peak Hours</h3>
             </div>
             <p className="text-xs md:text-sm text-gray-600">
-              Most orders are placed between{" "}
-              <span className="font-bold text-blue-600">12 PM - 2 PM</span> and{" "}
-              <span className="font-bold text-blue-600">6 PM - 8 PM</span>
+              Most orders are placed at{" "}
+              {insights.peakTimes && insights.peakTimes.length > 0 ? (
+                insights.peakTimes.map((time, index) => (
+                  <span key={index}>
+                    <span className="font-bold text-blue-600">{time.hour}</span>
+                    {index < insights.peakTimes.length - 1 ? " and " : ""}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-400">No data available</span>
+              )}
             </p>
           </div>
 
@@ -476,9 +484,8 @@ const Analytics = () => {
               <h3 className="font-bold text-gray-900 text-sm md:text-base">Best Seller</h3>
             </div>
             <p className="text-xs md:text-sm text-gray-600">
-              <span className="font-bold text-green-600">Chicken Pizza</span> is
-              the most ordered item with{" "}
-              <span className="font-bold">320 orders</span> this period
+              <span className="font-bold text-green-600">{insights.bestSellingProduct}</span> is
+              the most ordered item
             </p>
           </div>
 
@@ -492,9 +499,9 @@ const Analytics = () => {
             <p className="text-xs md:text-sm text-gray-600">
               You've gained{" "}
               <span className="font-bold text-purple-600">
-                156 new customers
+                {analytics.newCustomers} new customers
               </span>{" "}
-              with a <span className="font-bold">78% retention rate</span>
+              and <span className="font-bold">{analytics.returningCustomers} returning customers</span>
             </p>
           </div>
         </div>

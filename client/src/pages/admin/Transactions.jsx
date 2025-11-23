@@ -51,8 +51,16 @@ const Transactions = () => {
     Refunded: HiRefresh,
   };
 
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    completed: 0,
+    pending: 0,
+    failed: 0,
+  });
+
   useEffect(() => {
     fetchTransactions();
+    fetchStats();
   }, []);
 
   useEffect(() => {
@@ -67,13 +75,39 @@ const Transactions = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
-      const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+      const list = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
       setTransactions(list);
       setFilteredTransactions(list);
     } catch (error) {
       console.error("Error fetching transactions:", error);
       setTransactions([]);
       setFilteredTransactions([]);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/transactions/stats`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      if (data.success) {
+        const { summary, statusBreakdown } = data.data;
+        const completed = statusBreakdown.find((s) => s._id === "Completed")?.count || 0;
+        const pending = statusBreakdown.find((s) => s._id === "Pending")?.count || 0;
+        const failed = statusBreakdown.find((s) => s._id === "Failed")?.count || 0;
+
+        setStats({
+          totalRevenue: summary.totalRevenue,
+          completed,
+          pending,
+          failed,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
     }
   };
 
@@ -93,7 +127,7 @@ const Transactions = () => {
       filtered = filtered.filter(
         (txn) =>
           txn?.transactionId?.toLowerCase?.().includes(q) ||
-          txn?.orderId?.toLowerCase?.().includes(q)
+          txn?.order?.orderNumber?.toLowerCase?.().includes(q)
       );
     }
 
@@ -117,6 +151,7 @@ const Transactions = () => {
         }
       );
       fetchTransactions();
+      fetchStats(); // Refresh stats after refund
       pushToast("Transaction refunded", "success");
     } catch (error) {
       console.error("Error refunding transaction:", error);
@@ -148,7 +183,7 @@ const Transactions = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Total Revenue</p>
-              <h3 className="text-3xl font-bold mt-2">৳45,230</h3>
+              <h3 className="text-3xl font-bold mt-2">৳{stats.totalRevenue.toLocaleString()}</h3>
             </div>
             <HiCheckCircle className="w-12 h-12 text-white/30" />
           </div>
@@ -158,7 +193,7 @@ const Transactions = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm">Completed</p>
-              <h3 className="text-3xl font-bold mt-2">1,234</h3>
+              <h3 className="text-3xl font-bold mt-2">{stats.completed}</h3>
             </div>
             <HiCheckCircle className="w-12 h-12 text-white/30" />
           </div>
@@ -168,7 +203,7 @@ const Transactions = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-yellow-100 text-sm">Pending</p>
-              <h3 className="text-3xl font-bold mt-2">23</h3>
+              <h3 className="text-3xl font-bold mt-2">{stats.pending}</h3>
             </div>
             <HiClock className="w-12 h-12 text-white/30" />
           </div>
@@ -178,7 +213,7 @@ const Transactions = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-red-100 text-sm">Failed</p>
-              <h3 className="text-3xl font-bold mt-2">8</h3>
+              <h3 className="text-3xl font-bold mt-2">{stats.failed}</h3>
             </div>
             <HiX className="w-12 h-12 text-white/30" />
           </div>
@@ -259,101 +294,92 @@ const Transactions = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {/* Sample Data - Replace with real data */}
-              {[...Array(10)].map((_, index) => {
-                const txn = {
-                  _id: `txn_${index}`,
-                  transactionId: `TXN${Math.random()
-                    .toString(36)
-                    .substr(2, 9)
-                    .toUpperCase()}`,
-                  orderId: `ORD${1000 + index}`,
-                  customer: { name: "John Doe" },
-                  amount: 450 + index * 50,
-                  paymentMethod: index % 2 === 0 ? "Bkash" : "Cash on Delivery",
-                  status: ["Completed", "Pending", "Failed", "Refunded"][
-                    index % 4
-                  ],
-                  createdAt: new Date().toISOString(),
-                };
+              {filteredTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
+                    No transactions found
+                  </td>
+                </tr>
+              ) : (
+                filteredTransactions.map((txn) => {
+                  const StatusIcon = statusIcons[txn.status] || HiClock;
 
-                const StatusIcon = statusIcons[txn.status];
-
-                return (
-                  <motion.tr
-                    key={txn._id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <span className="font-mono text-sm font-semibold text-gray-900">
-                        {txn.transactionId}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="font-mono text-sm text-gray-600">
-                        #{txn.orderId}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-gray-900">{txn.customer.name}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="font-bold text-gray-900">
-                        ৳{txn.amount}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                          txn.paymentMethod === "Bkash"
+                  return (
+                    <motion.tr
+                      key={txn._id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-sm font-semibold text-gray-900">
+                          {txn.transactionId}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-sm text-gray-600">
+                          #{txn.order?.orderNumber || "N/A"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-gray-900">
+                          {txn.user?.name || "Unknown User"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-bold text-gray-900">
+                          ৳{txn.amount}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${txn.paymentMethod === "Bkash"
                             ? "bg-pink-100 text-pink-700"
                             : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {txn.paymentMethod}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold border ${
-                          statusColors[txn.status]
-                        }`}
-                      >
-                        <StatusIcon className="w-4 h-4" />
-                        <span>{txn.status}</span>
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">
-                        {new Date(txn.createdAt).toLocaleString()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => {
-                            setSelectedTransaction(txn);
-                            setShowTransactionModal(true);
-                          }}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            }`}
                         >
-                          <HiEye className="w-5 h-5 text-gray-600" />
-                        </button>
-                        {txn.status === "Completed" && (
+                          {txn.paymentMethod}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[txn.status] || "bg-gray-100 text-gray-700 border-gray-200"
+                            }`}
+                        >
+                          <StatusIcon className="w-4 h-4" />
+                          <span>{txn.status}</span>
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {new Date(txn.createdAt).toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => refundTransaction(txn._id)}
-                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                            onClick={() => {
+                              setSelectedTransaction(txn);
+                              setShowTransactionModal(true);
+                            }}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                           >
-                            <HiRefresh className="w-5 h-5 text-red-600" />
+                            <HiEye className="w-5 h-5 text-gray-600" />
                           </button>
-                        )}
-                      </div>
-                    </td>
-                  </motion.tr>
-                );
-              })}
+                          {txn.status === "Completed" && (
+                            <button
+                              onClick={() => refundTransaction(txn._id)}
+                              className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <HiRefresh className="w-5 h-5 text-red-600" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </motion.tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -406,13 +432,13 @@ const Transactions = () => {
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Order ID</p>
                     <p className="font-mono font-semibold text-gray-900">
-                      #{selectedTransaction.orderId}
+                      #{selectedTransaction.order?.orderNumber || "N/A"}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Customer</p>
                     <p className="font-semibold text-gray-900">
-                      {selectedTransaction.customer.name}
+                      {selectedTransaction.user?.name || "Unknown User"}
                     </p>
                   </div>
                   <div>
@@ -424,11 +450,10 @@ const Transactions = () => {
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Payment Method</p>
                     <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                        selectedTransaction.paymentMethod === "Bkash"
-                          ? "bg-pink-100 text-pink-700"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${selectedTransaction.paymentMethod === "Bkash"
+                        ? "bg-pink-100 text-pink-700"
+                        : "bg-gray-100 text-gray-700"
+                        }`}
                     >
                       {selectedTransaction.paymentMethod}
                     </span>
@@ -436,9 +461,8 @@ const Transactions = () => {
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Status</p>
                     <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                        statusColors[selectedTransaction.status]
-                      }`}
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${statusColors[selectedTransaction.status]
+                        }`}
                     >
                       {selectedTransaction.status}
                     </span>
@@ -525,15 +549,13 @@ const Transactions = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.6 }}
-              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${
-                t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
-              }`}
+              className={`bg-white rounded-xl shadow-lg ring-1 overflow-hidden ${t.type === "success" ? "ring-green-200" : t.type === "error" ? "ring-red-200" : t.type === "warning" ? "ring-amber-200" : "ring-blue-200"
+                }`}
             >
               <div className="relative">
                 <div
-                  className={`absolute left-0 top-0 h-full w-1 ${
-                    t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
-                  }`}
+                  className={`absolute left-0 top-0 h-full w-1 ${t.type === "success" ? "bg-green-500" : t.type === "error" ? "bg-red-500" : t.type === "warning" ? "bg-amber-500" : "bg-blue-500"
+                    }`}
                 />
                 <div className="p-3 pl-4 pr-10 flex items-start gap-3">
                   <div className="mt-0.5 shrink-0">

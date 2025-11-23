@@ -320,8 +320,8 @@ export default function FoodDetail() {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setActiveImageIdx(idx)}
                     className={`relative aspect-square rounded-2xl overflow-hidden transition-all duration-300 ${activeImageIdx === idx
-                        ? "ring-4 ring-primary-500 ring-offset-2 shadow-xl"
-                        : "hover:ring-2 hover:ring-gray-300 opacity-70 hover:opacity-100"
+                      ? "ring-4 ring-primary-500 ring-offset-2 shadow-xl"
+                      : "hover:ring-2 hover:ring-gray-300 opacity-70 hover:opacity-100"
                       }`}
                   >
                     <img
@@ -392,8 +392,8 @@ export default function FoodDetail() {
                     >
                       <HiStar
                         className={`w-5 h-5 ${i < Math.floor(rating)
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-gray-300"
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-300"
                           }`}
                       />
                     </motion.span>
@@ -455,33 +455,35 @@ export default function FoodDetail() {
             </motion.div>
 
             {/* Quantity selector */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="flex items-center gap-4"
-            >
-              <span className="text-sm font-bold text-gray-700">Quantity:</span>
-              <div className="flex items-center gap-3 bg-white rounded-full shadow-md px-2 py-2">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors"
-                >
-                  −
-                </motion.button>
-                <span className="w-12 text-center font-bold text-lg">{quantity}</span>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors"
-                >
-                  +
-                </motion.button>
-              </div>
-            </motion.div>
+            {food.isAvailable && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center gap-4"
+              >
+                <span className="text-sm font-bold text-gray-700">Quantity:</span>
+                <div className="flex items-center gap-3 bg-white rounded-full shadow-md px-2 py-2">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors"
+                  >
+                    −
+                  </motion.button>
+                  <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors"
+                  >
+                    +
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
 
             {/* Action Buttons */}
             <motion.div
@@ -491,14 +493,20 @@ export default function FoodDetail() {
               className="flex gap-4"
             >
               <motion.button
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={handleAddToCart}
-                className="relative flex-1 bg-gradient-to-r from-primary-500 via-primary-600 to-orange-500 text-white px-8 py-5 rounded-2xl font-black text-lg shadow-2xl overflow-hidden group"
+                whileHover={food.isAvailable ? { scale: 1.03, y: -2 } : {}}
+                whileTap={food.isAvailable ? { scale: 0.97 } : {}}
+                onClick={food.isAvailable ? handleAddToCart : undefined}
+                disabled={!food.isAvailable}
+                className={`relative flex-1 px-8 py-5 rounded-2xl font-black text-lg shadow-2xl overflow-hidden group ${food.isAvailable
+                    ? "bg-gradient-to-r from-primary-500 via-primary-600 to-orange-500 text-white"
+                    : "bg-gray-200 text-gray-500 cursor-not-allowed shadow-none"
+                  }`}
               >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                />
+                {food.isAvailable && (
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  />
+                )}
 
                 <AnimatePresence>
                   {isAddedToCart && (
@@ -513,16 +521,20 @@ export default function FoodDetail() {
                 </AnimatePresence>
 
                 <span className="relative flex items-center justify-center gap-3">
-                  {isAddedToCart ? (
-                    <>
-                      <HiCheckCircle className="w-7 h-7" />
-                      Added to Cart!
-                    </>
+                  {food.isAvailable ? (
+                    isAddedToCart ? (
+                      <>
+                        <HiCheckCircle className="w-7 h-7" />
+                        Added to Cart!
+                      </>
+                    ) : (
+                      <>
+                        <HiShoppingCart className="w-7 h-7" />
+                        Add to Cart
+                      </>
+                    )
                   ) : (
-                    <>
-                      <HiShoppingCart className="w-7 h-7" />
-                      Add to Cart
-                    </>
+                    <span>Currently Unavailable</span>
                   )}
                 </span>
               </motion.button>
@@ -532,8 +544,8 @@ export default function FoodDetail() {
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsFavorite(!isFavorite)}
                 className={`px-6 py-5 rounded-2xl font-bold transition-all duration-300 shadow-lg ${isFavorite
-                    ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
-                    : "bg-white border-2 border-gray-200 text-gray-400 hover:border-pink-300 hover:text-pink-500"
+                  ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
+                  : "bg-white border-2 border-gray-200 text-gray-400 hover:border-pink-300 hover:text-pink-500"
                   }`}
               >
                 <HiHeart className={`w-7 h-7 ${isFavorite ? "fill-current" : ""}`} />
@@ -674,8 +686,8 @@ export default function FoodDetail() {
                         <HiStar
                           key={i}
                           className={`w-5 h-5 ${i < Math.round(rev.rating || 0)
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-gray-300"
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-gray-300"
                             }`}
                         />
                       ))}
